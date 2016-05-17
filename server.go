@@ -1,15 +1,30 @@
 package main
 
 import (
-	"io"
+	"fmt"
+	"html/template"
 	"net/http"
 )
 
-func hello(w http.ResponseWriter, h *http.Request) {
-	io.WriteString(w, "Hello world!")
+type page struct {
+	Title string
+	Body  string
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "<h1>%s</h1>", "Welcome to LAWLIPOPS!")
+}
+
+func challengesHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("/challenges/"):]
+	body := "Nothing to see here"
+	p := page{Title: title, Body: body}
+	t, _ := template.ParseFiles("challenges.html")
+	t.Execute(w, p)
 }
 
 func main() {
-	http.HandleFunc("/", hello)
+	http.HandleFunc("/", index)
+	http.HandleFunc("/challenges/", challengesHandler)
 	http.ListenAndServe(":8000", nil)
 }
