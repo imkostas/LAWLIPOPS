@@ -1,12 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var templates = template.Must(template.ParseFiles("templates/index.html",
@@ -36,18 +39,6 @@ func challengesHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "challenges", p)
 }
 
-// func uploadHandler(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("method: ", r.Method)
-// 	if r.Method == "GET" {
-// 		display(w, "upload", nil)
-// 	} else {
-// 		r.ParseForm()
-//
-// 		fmt.Println("file: ", r.Form["file"]) // file is from the name of the input
-//
-// 	}
-// }
-
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	//GET displays the upload form.
@@ -67,6 +58,19 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		//get a ref to the parsed multipart form
 		m := r.MultipartForm
+
+		// Open Database connection
+		// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36:3306)/test?tls=skip-verify$autocommit=true")
+		db, err := sql.Open("mysql", "root:root@/test")
+		if err != nil {
+			panic(err.Error())
+		}
+		defer db.Close()
+		err = db.Ping()
+		if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+		}
 
 		//get the *fileheaders
 		files := m.File["myfiles"]
@@ -94,10 +98,23 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-		}
+
+			// Insert into DB
+			stmtIns, err := db.Prepare("INSERT INTO `data` (`id`, `doc`, `flag`) VALUES (NULL, ?, ?);")
+            if err != nil {
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+            }
+            defer stmtIns.Close()
+
+            _, err = stmtIns.Exec("files/" + files[i].Filename, 0)
+            if err != nil {
+                http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+            }
+
 		//display success message.
 		display(w, "upload", "Upload successful!")
-		// http.Redirect(w, r, "/upload/", http.StatusFound)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
