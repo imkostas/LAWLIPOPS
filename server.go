@@ -43,7 +43,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 func challengesHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/challenges/"):]
 	body := "Nothing to see here"
-	p := page{Title: title, Body: body, Files: nil, Message: nil}
+	p := page{Title: title, Body: body, Files: nil, Message: ""}
 	display(w, "challenges", p)
 }
 
@@ -62,7 +62,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := page{Title: "Upload File", Body: nil, Files: nil, Message: nil}
+	p := page{Title: "Upload File", Body: "", Files: nil, Message: ""}
 
 	rows, err := db.Query("SELECT * FROM data")
 	if err != nil {
