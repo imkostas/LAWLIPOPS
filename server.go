@@ -68,8 +68,8 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		defer db.Close()
 		err = db.Ping()
 		if err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		//get the *fileheaders
@@ -101,17 +101,18 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Insert into DB
 			stmtIns, err := db.Prepare("INSERT INTO `data` (`id`, `doc`, `flag`) VALUES (NULL, ?, ?);")
-            if err != nil {
-                http.Error(w, err.Error(), http.StatusInternalServerError)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
-            }
-            defer stmtIns.Close()
+			}
+			defer stmtIns.Close()
 
-            _, err = stmtIns.Exec("files/" + files[i].Filename, 0)
-            if err != nil {
-                http.Error(w, err.Error(), http.StatusInternalServerError)
+			_, err = stmtIns.Exec("files/"+files[i].Filename, 0)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
-            }
+			}
+		}
 
 		//display success message.
 		display(w, "upload", "Upload successful!")
