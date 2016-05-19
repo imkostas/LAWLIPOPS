@@ -64,7 +64,8 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	p := page{Title: "Upload File", Body: "", Files: nil, Message: ""}
 
-	rows, err := db.Query("SELECT * FROM data")
+	varname := "lab"
+	rows, err := db.Query("SELECT * FROM data WHERE doc LIKE '%" + varname + "%'")
 	checkError(w, err)
 
 	columns, err := rows.Columns()
@@ -147,7 +148,8 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// display success message.
-		display(w, "upload", "Upload successful!")
+		p.Message = "Upload successful"
+		display(w, "upload", p)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
