@@ -18,7 +18,11 @@
       </form>
     </div>
     <div id="Files">
-
+        {{with .Files}}
+            {{range .}}
+            <p>{{.ID}}  {{.Path}}  {{.Flag}}</p>
+            {{end}}
+        {{end}}
     </div>
 </body>
 </html>

@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -16,16 +15,16 @@ var templates = template.Must(template.ParseFiles("templates/index.html",
 	"templates/upload.html",
 	"templates/challenges.html"))
 
-type File struct {
-	ID   int
+type file struct {
+	ID   string
 	Path string
-	Flag int
+	Flag string
 }
 
 type page struct {
 	Title   string
 	Body    string
-	Files   []*File
+	Files   []file
 	Message string
 }
 
@@ -47,33 +46,29 @@ func challengesHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "challenges", p)
 }
 
+func checkError(w http.ResponseWriter, err error) {
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Open Database connection
-	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36:3306)/test?tls=skip-verify$autocommit=true")
+	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36)/test?tls=skip-verify$autocommit=true")
 	db, err := sql.Open("mysql", "root:root@/test")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	checkError(w, err)
+
 	defer db.Close()
 	err = db.Ping()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	checkError(w, err)
 
 	p := page{Title: "Upload File", Body: "", Files: nil, Message: ""}
 
 	rows, err := db.Query("SELECT * FROM data")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	checkError(w, err)
+
 	columns, err := rows.Columns()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	checkError(w, err)
 
 	values := make([]sql.RawBytes, len(columns))
 
@@ -84,62 +79,59 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		checkError(w, err)
 
-		var value string
-		for i, col := range values {
-			if col == nil {
-				value = "NULL"
-			} else {
-				value = string(col)
-			}
-			fmt.Println(columns[i], ": ", value)
-		}
+		// var value string
+		// for i, col := range values {
+		// 	if col == nil {
+		// 		value = "NULL"
+		// 	} else {
+		// 		value = string(col)
+		// 	}
+		// 	fmt.Println(columns[i], ": ", value)
+		// }
+		f := file{ID: "", Path: "", Flag: ""}
+		f.ID = string(values[0])
+		f.Path = string(values[1])
+		f.Flag = string(values[2])
+		p.Files = append(p.Files, f)
 	}
 
 	switch r.Method {
-	//GET displays the upload form.
+	// GET displays the upload form
 	case "GET":
 		p.Message = "Choose files to upload"
 		display(w, "upload", p)
 
-	//POST takes the uploaded file(s) and saves it to disk.
+	// POST takes the uploaded file(s) saves it to disk, and updates the database
 	case "POST":
-		//parse the multipart form in the request
+		// parse the multipart form in the request
 		err := r.ParseMultipartForm(100000)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		checkError(w, err)
 
-		//get a ref to the parsed multipart form
+		// get a ref to the parsed multipart form
 		m := r.MultipartForm
 
-		//get the *fileheaders
+		// get the *fileheaders
 		files := m.File["myfiles"]
 		for i, _ := range files {
-			//for each fileheader, get a handle to the actual file
+			// for each fileheader, get a handle to the actual file
 			file, err := files[i].Open()
 			defer file.Close()
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			//create destination file making sure the path is writeable.
+			checkError(w, err)
+
+			// create destination file making sure the path is writeable.
 			dst, err := os.Create("files/" + files[i].Filename)
-			if err != nil {
-				fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege")
-				return
-			}
+			// if err != nil {
+			// 	fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege")
+			// 	return
+			// }
+			checkError(w, err)
+
 			defer dst.Close()
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			//copy the uploaded file to the destination file
+			checkError(w, err)
+
+			// copy the uploaded file to the destination file
 			if _, err := io.Copy(dst, file); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -147,20 +139,14 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Insert into DB
 			stmtIns, err := db.Prepare("INSERT INTO `data` (`id`, `doc`, `flag`) VALUES (NULL, ?, ?);")
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+			checkError(w, err)
 			defer stmtIns.Close()
 
 			_, err = stmtIns.Exec("files/"+files[i].Filename, 0)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+			checkError(w, err)
 		}
 
-		//display success message.
+		// display success message.
 		display(w, "upload", "Upload successful!")
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
