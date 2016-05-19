@@ -9,13 +9,16 @@
     </form> -->
     <div class="container">
       <h1>File Upload Demo</h1>
-      <div class="message">{{.}}</div>
+      <div class="message">{{.Message}}</div>
       <form class="form-signin" method="POST" action="/upload/" enctype="multipart/form-data">
         <fieldset>
             <input type="file" name="myfiles" id="myfiles" multiple="multiple">
             <input type="submit" name="submit" value="Submit">
         </fieldset>
       </form>
+    </div>
+    <div id="Files">
+
     </div>
 </body>
 </html>

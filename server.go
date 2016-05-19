@@ -16,9 +16,17 @@ var templates = template.Must(template.ParseFiles("templates/index.html",
 	"templates/upload.html",
 	"templates/challenges.html"))
 
+type File struct {
+	ID   int
+	Path string
+	Flag int
+}
+
 type page struct {
-	Title string
-	Body  string
+	Title   string
+	Body    string
+	Files   []*File
+	Message string
 }
 
 func display(w http.ResponseWriter, name string, data interface{}) {
@@ -35,20 +43,71 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 func challengesHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/challenges/"):]
 	body := "Nothing to see here"
-	p := page{Title: title, Body: body}
+	p := page{Title: title, Body: body, Files: nil, Message: nil}
 	display(w, "challenges", p)
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	// Open Database connection
+	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36:3306)/test?tls=skip-verify$autocommit=true")
+	db, err := sql.Open("mysql", "root:root@/test")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	p := page{Title: "Upload File", Body: nil, Files: nil, Message: nil}
+
+	rows, err := db.Query("SELECT * FROM data")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	columns, err := rows.Columns()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	values := make([]sql.RawBytes, len(columns))
+
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var value string
+		for i, col := range values {
+			if col == nil {
+				value = "NULL"
+			} else {
+				value = string(col)
+			}
+			fmt.Println(columns[i], ": ", value)
+		}
+	}
+
 	switch r.Method {
 	//GET displays the upload form.
 	case "GET":
-		display(w, "upload", "Choose files")
+		p.Message = "Choose files to upload"
+		display(w, "upload", p)
 
 	//POST takes the uploaded file(s) and saves it to disk.
 	case "POST":
-		// // file, header, err := r.FormFile("file")
-
 		//parse the multipart form in the request
 		err := r.ParseMultipartForm(100000)
 		if err != nil {
@@ -58,19 +117,6 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		//get a ref to the parsed multipart form
 		m := r.MultipartForm
-
-		// Open Database connection
-		// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36:3306)/test?tls=skip-verify$autocommit=true")
-		db, err := sql.Open("mysql", "root:root@/test")
-		if err != nil {
-			panic(err.Error())
-		}
-		defer db.Close()
-		err = db.Ping()
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
 
 		//get the *fileheaders
 		files := m.File["myfiles"]
