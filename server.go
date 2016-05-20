@@ -11,9 +11,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var templates = template.Must(template.ParseFiles("templates/index.html",
+var templates = template.Must(template.ParseFiles(
+    "templates/index.html",
 	"templates/upload.html",
-	"templates/challenges.html"))
+	"templates/challenges.html",
+    "templates/case.html"))
 
 type file struct {
 	ID   string
@@ -28,8 +30,22 @@ type page struct {
 	Message string
 }
 
+type binaryCase struct {
+    ID      	string
+    Title       string
+    Summary     string
+    FileFor 	string
+    FileAgainst string
+    Date 		string
+    Archived    string
+    Decision    string
+}
+
 func display(w http.ResponseWriter, name string, data interface{}) {
-	templates.ExecuteTemplate(w, name+".html", data)
+  err := templates.ExecuteTemplate(w, name+".html", data)
+  if err != nil {
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+  }
 
 	// t, _ := template.ParseFiles("challenges.html")
 	// t.Execute(w, p)
@@ -46,30 +62,32 @@ func challengesHandler(w http.ResponseWriter, r *http.Request) {
 	display(w, "challenges", p)
 }
 
-func checkError(w http.ResponseWriter, err error) {
+func checkError(w http.ResponseWriter, err error, msg string) {
 	if err != nil {
+		log.Println(msg)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Open Database connection
-	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36)/test?tls=skip-verify$autocommit=true")
+	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36:80)/test?tls=skip-verify$autocommit=true")
+	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36)/test")
 	db, err := sql.Open("mysql", "root:root@/test")
-	checkError(w, err)
+	checkError(w, err, "Can't open db connection")
 
 	defer db.Close()
 	err = db.Ping()
-	checkError(w, err)
+	checkError(w, err, "Ping Error")
 
 	p := page{Title: "Upload File", Body: "", Files: nil, Message: ""}
 
 	varname := "lab"
 	rows, err := db.Query("SELECT * FROM data WHERE doc LIKE '%" + varname + "%'")
-	checkError(w, err)
+	checkError(w, err, "")
 
 	columns, err := rows.Columns()
-	checkError(w, err)
+	checkError(w, err, "Error getting columns")
 
 	values := make([]sql.RawBytes, len(columns))
 
@@ -80,7 +98,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
-		checkError(w, err)
+		checkError(w, err, "")
 
 		// var value string
 		// for i, col := range values {
@@ -108,7 +126,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		// parse the multipart form in the request
 		err := r.ParseMultipartForm(100000)
-		checkError(w, err)
+		checkError(w, err, "")
 
 		// get a ref to the parsed multipart form
 		m := r.MultipartForm
@@ -119,7 +137,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			// for each fileheader, get a handle to the actual file
 			file, err := files[i].Open()
 			defer file.Close()
-			checkError(w, err)
+			checkError(w, err, "")
 
 			// create destination file making sure the path is writeable.
 			dst, err := os.Create("files/" + files[i].Filename)
@@ -127,10 +145,10 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			// 	fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege")
 			// 	return
 			// }
-			checkError(w, err)
+			checkError(w, err, "")
 
 			defer dst.Close()
-			checkError(w, err)
+			checkError(w, err, "")
 
 			// copy the uploaded file to the destination file
 			if _, err := io.Copy(dst, file); err != nil {
@@ -140,11 +158,11 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Insert into DB
 			stmtIns, err := db.Prepare("INSERT INTO `data` (`id`, `doc`, `flag`) VALUES (NULL, ?, ?);")
-			checkError(w, err)
+			checkError(w, err, "")
 			defer stmtIns.Close()
 
 			_, err = stmtIns.Exec("files/"+files[i].Filename, 0)
-			checkError(w, err)
+			checkError(w, err, "")
 		}
 
 		// display success message.
@@ -155,10 +173,81 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getCases(w http.ResponseWriter, r *http.Request, searchString string) []binaryCase {
+  	// Select all from cases table
+  	db, err := sql.Open("mysql", "root:root@/test")
+	checkError(w, err, "Can't open db connection")
+    
+	defer db.Close()
+    err = db.Ping()
+	checkError(w, err, "Ping Error")
+
+    b := make([]binaryCase, 0, 0)
+
+//	rows, err := db.Query("SELECT * FROM cases WHERE title LIKE '%" + searchString + "%'")
+    rows, err := db.Query(searchString)
+	checkError(w, err, "")
+
+	columns, err := rows.Columns()
+	checkError(w, err, "Error getting columns")
+
+	values := make([]sql.RawBytes, len(columns))
+
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		checkError(w, err, "")
+	  
+        c := binaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
+		c.ID = string(values[0])
+		c.Title = string(values[1])
+		c.Summary = string(values[2])
+        c.FileFor = string(values[3])
+        c.FileAgainst = string(values[4])
+        c.Date = string(values[5])
+        c.Archived = string(values[6])
+        c.Decision = string(values[7])
+		b = append(b, c)
+	}
+    
+    return b
+}
+
+func getCase(w http.ResponseWriter, r *http.Request, caseID string) binaryCase {
+  	// Select all from cases table
+  	db, err := sql.Open("mysql", "root:root@/test")
+	checkError(w, err, "Can't open db connection")
+    
+    defer db.Close()
+    
+    stmntOut, err := db.Prepare("SELECT * FROM cases WHERE id = ?")
+    checkError(w, err, "")
+    defer stmntOut.Close()
+    
+    c := binaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
+    err = stmntOut.QueryRow(caseID).Scan(&c.ID, &c.Title, &c.Summary, &c.FileFor, &c.FileAgainst, &c.Date, &c.Archived, &c.Decision)
+    checkError(w, err, "")
+    
+    return c
+}
+
+func caseHandler(w http.ResponseWriter, r *http.Request){
+    caseID := r.URL.Path[len("/cases/"):]
+    caseToDisplay := getCase(w, r, caseID)
+    
+    display(w, "case", caseToDisplay)
+}
+
 func main() {
+    
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/challenges/", challengesHandler)
 	http.HandleFunc("/upload/", uploadHandler)
+	http.HandleFunc("/cases/", caseHandler)
 	// http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
 	err := http.ListenAndServe(":8000", nil)

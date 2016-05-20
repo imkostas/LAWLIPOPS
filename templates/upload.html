@@ -9,7 +9,7 @@
     </form> -->
     <div class="container">
       <h1>File Upload Demo</h1>
-	<p><a href="/">Home</a></p>
+      <p><a href="/">Home</a></p>
       <div class="message">{{.Message}}</div>
       <form class="form-signin" method="POST" action="/upload/" enctype="multipart/form-data">
         <fieldset>
@@ -22,10 +22,12 @@
 	<br>
 	<table border="1">
         {{with .Files}}
-		<tr><td>ID</td><td>Path</td><td>Flag</td></tr>
+		<tr>
+			<td>ID</td><td>Path</td><td>Flag</td>
+		</tr>
             {{range .}}
 		<tr>
-            	<td>{{.ID}}</td><td>{{.Path}}</td><td>{{.Flag}}</td>
+			<td>{{.ID}}</td><td>{{.Path}}</td><td>{{.Flag}}</td>
 		</tr>
             {{end}}
         {{end}}
