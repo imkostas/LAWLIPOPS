@@ -12,10 +12,10 @@ import (
 )
 
 var templates = template.Must(template.ParseFiles(
-    "templates/index.html",
+	"templates/index.html",
 	"templates/upload.html",
 	"templates/challenges.html",
-    "templates/case.html"))
+	"templates/case.html"))
 
 type file struct {
 	ID   string
@@ -31,28 +31,29 @@ type page struct {
 }
 
 type binaryCase struct {
-    ID      	string
-    Title       string
-    Summary     string
-    FileFor 	string
-    FileAgainst string
-    Date 		string
-    Archived    string
-    Decision    string
+	ID          string
+	Title       string
+	Summary     string
+	FileFor     string
+	FileAgainst string
+	Date        string
+	Archived    string
+	Decision    string
 }
 
 func display(w http.ResponseWriter, name string, data interface{}) {
-  err := templates.ExecuteTemplate(w, name+".html", data)
-  if err != nil {
-	http.Error(w, err.Error(), http.StatusInternalServerError)
-  }
+	err := templates.ExecuteTemplate(w, name+".html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 	// t, _ := template.ParseFiles("challenges.html")
 	// t.Execute(w, p)
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	display(w, "index", nil)
+	c := getCases(w, r, "SELECT * FROM cases WHERE archived = 0")
+	display(w, "index", c)
 }
 
 func challengesHandler(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +83,8 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	p := page{Title: "Upload File", Body: "", Files: nil, Message: ""}
 
-	varname := "lab"
+	// varname := "lab"
+	varname := ""
 	rows, err := db.Query("SELECT * FROM data WHERE doc LIKE '%" + varname + "%'")
 	checkError(w, err, "")
 
@@ -174,18 +176,18 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getCases(w http.ResponseWriter, r *http.Request, searchString string) []binaryCase {
-  	// Select all from cases table
-  	db, err := sql.Open("mysql", "root:root@/test")
+	// Select all from cases table
+	db, err := sql.Open("mysql", "root:root@/test")
 	checkError(w, err, "Can't open db connection")
-    
+
 	defer db.Close()
-    err = db.Ping()
+	err = db.Ping()
 	checkError(w, err, "Ping Error")
 
-    b := make([]binaryCase, 0, 0)
+	b := make([]binaryCase, 0, 0)
 
-//	rows, err := db.Query("SELECT * FROM cases WHERE title LIKE '%" + searchString + "%'")
-    rows, err := db.Query(searchString)
+	//	rows, err := db.Query("SELECT * FROM cases WHERE title LIKE '%" + searchString + "%'")
+	rows, err := db.Query(searchString)
 	checkError(w, err, "")
 
 	columns, err := rows.Columns()
@@ -201,49 +203,57 @@ func getCases(w http.ResponseWriter, r *http.Request, searchString string) []bin
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
 		checkError(w, err, "")
-	  
-        c := binaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
+
+		c := binaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
 		c.ID = string(values[0])
 		c.Title = string(values[1])
 		c.Summary = string(values[2])
-        c.FileFor = string(values[3])
-        c.FileAgainst = string(values[4])
-        c.Date = string(values[5])
-        c.Archived = string(values[6])
-        c.Decision = string(values[7])
+		c.FileFor = string(values[3])
+		c.FileAgainst = string(values[4])
+		c.Date = string(values[5])
+		c.Archived = string(values[6])
+		c.Decision = string(values[7])
 		b = append(b, c)
 	}
-    
-    return b
+
+	return b
 }
 
 func getCase(w http.ResponseWriter, r *http.Request, caseID string) binaryCase {
-  	// Select all from cases table
-  	db, err := sql.Open("mysql", "root:root@/test")
+	// Select all from cases table
+	db, err := sql.Open("mysql", "root:root@/test")
 	checkError(w, err, "Can't open db connection")
-    
-    defer db.Close()
-    
-    stmntOut, err := db.Prepare("SELECT * FROM cases WHERE id = ?")
-    checkError(w, err, "")
-    defer stmntOut.Close()
-    
-    c := binaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
-    err = stmntOut.QueryRow(caseID).Scan(&c.ID, &c.Title, &c.Summary, &c.FileFor, &c.FileAgainst, &c.Date, &c.Archived, &c.Decision)
-    checkError(w, err, "")
-    
-    return c
+
+	defer db.Close()
+
+	stmntOut, err := db.Prepare("SELECT * FROM cases WHERE id = ?")
+	checkError(w, err, "")
+	defer stmntOut.Close()
+
+	c := binaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
+	err = stmntOut.QueryRow(caseID).Scan(&c.ID,
+		&c.Title,
+		&c.Summary,
+		&c.FileFor,
+		&c.FileAgainst,
+		&c.Date,
+		&c.Archived,
+		&c.Decision)
+
+	checkError(w, err, "")
+
+	return c
 }
 
-func caseHandler(w http.ResponseWriter, r *http.Request){
-    caseID := r.URL.Path[len("/cases/"):]
-    caseToDisplay := getCase(w, r, caseID)
-    
-    display(w, "case", caseToDisplay)
+func caseHandler(w http.ResponseWriter, r *http.Request) {
+	caseID := r.URL.Path[len("/cases/"):]
+	caseToDisplay := getCase(w, r, caseID)
+
+	display(w, "case", caseToDisplay)
 }
 
 func main() {
-    
+
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/challenges/", challengesHandler)
 	http.HandleFunc("/upload/", uploadHandler)

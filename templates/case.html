@@ -1,15 +1,31 @@
+<!DOCTYPE html>
 <html>
 
 <head>
-    <h2>{{.Title}}</h2>
+    <div>
+		<h2><a href="/">Lawlipops</a></h2>
+	</div>
+    <!-- <br /> -->
+    <!-- <strong><label>Title: </label></strong> -->
+    <h3>{{.Title}}</h3>
 </head>
 
 <body>
+    <!-- <strong><label>Summary: </label></strong> -->
     <p>{{.Summary}}</p>
-    <p>{{.FileFor}}</p>
-    <p>{{.FileAgainst}}</p>
-    <p>{{.Date}}</p>
-    <p>{{.Archived}}</p>
+    <!-- <strong><label>File for path: </label></strong> -->
+    <p>For: {{.FileFor}}</p>
+    <!-- <strong><label>File against path: </label></strong> -->
+    <p>Against: {{.FileAgainst}}</p>
+    <!-- <strong><label>Date created: </label></strong> -->
+    <!-- <p>{{.Date}}</p> -->
+    <!-- <strong><label>IsArchived: </label></strong> -->
+    <!-- <p>{{.Archived}}</p> -->
+    <!-- <strong><label>Decision: </label></strong> -->
+    <!-- <p>{{.Decision}}</p> -->
+    <label>Do you think the court will affirm or reverse the decision?</label>
+    <br />
+    <button>Affirm</button><button>Reverse</button>
 </body>
 
 </html>
