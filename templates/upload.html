@@ -1,37 +1,40 @@
+<!DOCTYPE html>
 <html>
+
 <head>
     <title></title>
 </head>
+
 <body>
-    <!-- <form action="/upload/" method="post">
-        File: <input type="file" name="file" />
-        <input type="submit" value="Submit" />
-    </form> -->
     <div class="container">
-      <h1>File Upload Demo</h1>
-      <p><a href="/">Home</a></p>
-      <div class="message">{{.Message}}</div>
-      <form class="form-signin" method="POST" action="/upload/" enctype="multipart/form-data">
-        <fieldset>
-            <input type="file" name="myfiles" id="myfiles" multiple="multiple">
-            <input type="submit" name="submit" value="Submit">
-        </fieldset>
-      </form>
+        <h1>File Upload Demo</h1>
+        <p><a href="/">Home</a></p>
+        <div class="message">{{.Message}}</div>
+        <form class="form-signin" method="POST" action="/upload" enctype="multipart/form-data">
+            <fieldset>
+                <input type="file" name="myfiles" id="myfiles" multiple="multiple">
+                <input type="submit" name="submit" value="Submit">
+            </fieldset>
+        </form>
     </div>
     <div id="Files">
-	<br>
-	<table border="1">
-        {{with .Files}}
-		<tr>
-			<td>ID</td><td>Path</td><td>Flag</td>
-		</tr>
+        <br>
+        <table border="1">
+            {{with .Files}}
+            <tr>
+                <td>ID</td>
+                <td>Path</td>
+                <td>Flag</td>
+            </tr>
             {{range .}}
-		<tr>
-			<td>{{.ID}}</td><td>{{.Path}}</td><td>{{.Flag}}</td>
-		</tr>
-            {{end}}
-        {{end}}
-	</table>
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Path}}</td>
+                <td>{{.Flag}}</td>
+            </tr>
+            {{end}} {{end}}
+        </table>
     </div>
 </body>
+
 </html>

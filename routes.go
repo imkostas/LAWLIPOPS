@@ -36,6 +36,12 @@ var routes = Routes{
 		"/upload",
 		UploadHandler,
 	},
+	Route{
+		"Upload",
+		"POST",
+		"/upload",
+		UploadHandler,
+	},
 }
 
 // NewRouter function creates a new router and returns a pointer to it

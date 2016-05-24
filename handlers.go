@@ -89,7 +89,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		// get the *fileheaders
 		files := m.File["myfiles"]
-		for i, _ := range files {
+		// for i, _ := range files {
+		for i := 0; i < len(files); i++ {
 			// for each fileheader, get a handle to the actual file
 			file, err := files[i].Open()
 			defer file.Close()
@@ -97,11 +98,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 			// create destination file making sure the path is writeable.
 			dst, err := os.Create("files/" + files[i].Filename)
-			// if err != nil {
-			// 	fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege")
-			// 	return
-			// }
-			CheckError(w, err, "")
+			CheckError(w, err, "Unable to create the file for writing. Check your write access privilege")
 
 			defer dst.Close()
 			CheckError(w, err, "")
