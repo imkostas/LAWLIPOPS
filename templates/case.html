@@ -2,34 +2,26 @@
 <html>
 
 <head>
-    <div>
-        <h2><a href="/">Lawlipops</a></h2>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="caseformat.css">
+    <div class="top">
+        <h2><a href="/">LAWliPOPS</a></h2>
     </div>
     <hr />
-    <!-- <br /> -->
-    <!-- <strong><label>Title: </label></strong> -->
 </head>
 
-<body>
-  <h3>Hello</h3>
-    <h3>{{.Title}}</h3>
-    <!-- <strong><label>Summary: </label></strong> -->
-    <p>{{.Summary}}</p>
-    <!-- <strong><label>File for path: </label></strong> -->
-    <p>For: {{.FileFor}}</p>
-    <!-- <strong><label>File against path: </label></strong> -->
-    <p>Against: {{.FileAgainst}}</p>
-    <!-- <strong><label>Date created: </label></strong> -->
-    <!-- <p>{{.Date}}</p> -->
-    <!-- <strong><label>IsArchived: </label></strong> -->
-    <!-- <p>{{.Archived}}</p> -->
-    <!-- <strong><label>Decision: </label></strong> -->
-    <!-- <p>{{.Decision}}</p> -->
-    <label>Do you think the court will affirm or reverse the decision?</label>
+<body background="justice.png">
+    <h3 class="title">{{.Title}}</h3>
+    <p class="summary">{{.Summary}}</p>
+    <p class="for">For: {{.FileFor}}</p>
+    <p class="against">Against: {{.FileAgainst}}</p>
+    <label class="ques">Do you think the court will affirm or reverse the decision?</label>
     <br />
     <br />
+    <div class="btns">
     <button>Affirm</button>
     <button>Reverse</button>
+  </div>
 </body>
 
 </html>

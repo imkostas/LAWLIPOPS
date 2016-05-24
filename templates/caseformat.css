@@ -1,0 +1,43 @@
+.top {
+  color:#BCC6CC;
+  font-family: "Garamond","advocate-c43";
+  text-decoration: none;
+  text-align: center;
+}
+
+.top:hover{
+
+}
+
+.title{
+  text-align: center;
+  font-family: "Garamond", "advocate-c43";
+  margin-bottom: 5em;
+}
+
+.summary{
+  text-align: center;
+  margin-bottom: 15em;
+}
+
+.for{
+  display:inline;
+  text-align: left;
+  margin-left: 15em;
+}
+
+.against{
+  display:inline;
+  text-align: right;
+  margin-left: 55em;
+}
+
+.ques{
+  margin-top: 10em;
+  display: block;
+  text-align:center;
+}
+
+.btns{
+  text-align: center;
+}
