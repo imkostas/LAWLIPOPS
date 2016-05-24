@@ -151,6 +151,8 @@ func main() {
 	// http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
 	r := NewRouter()
+	s := http.StripPrefix("/css/", http.FileServer(http.Dir("./css/")))
+	r.PathPrefix("/css/").Handler(s)
 	log.Fatal(http.ListenAndServe(":8000", r))
 	// err := http.ListenAndServe(":8000", r)
 	// if err != nil {
