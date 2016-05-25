@@ -21,15 +21,15 @@
 }
 
 .for{
-  display:inline;
+  /*display:inline;
   text-align: left;
-  margin-left: 15em;
+  margin-left: 15em;*/
 }
 
 .against{
-  display:inline;
+  /*display:inline;
   text-align: right;
-  margin-left: 55em;
+  margin-left: 60em;*/
 }
 
 .ques{
@@ -40,4 +40,8 @@
 
 .btns{
   text-align: center;
+}
+
+.jumbotron{
+
 }

@@ -3,7 +3,7 @@
 
 <head>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="/css/caseformat.css">
+  <link rel="stylesheet" type="text/css" href="../css/caseformat.css">
     <div class="top">
         <h2><a href="/">LAWliPOPS</a></h2>
     </div>
@@ -11,17 +11,49 @@
 </head>
 
 <body>
-    <h3 class="title">{{.Title}}</h3>
-    <p class="summary">{{.Summary}}</p>
-    <p class="for">For: {{.FileFor}}</p>
-    <p class="against">Against: {{.FileAgainst}}</p>
-    <label class="ques">Do you think the court will affirm or reverse the decision?</label>
+
+  <header class="container">
+    <div class="row">
+      <h3 class="title">{{.Title}}</h3>
+    </div>
+    <section class="jumbotron">
+      <div class="row text-center">
+        <p class="summary">{{.Summary}}</p>
+      </div>
+    </section>
+
+    <section class ="container">
+      <div class ="row">
+        <figure class="col-sm-4">
+            <p class="for">For: {{.FileFor}}</p>
+        </figure>
+        <figure class = "col-sm-6">
+        </figure>
+        <figure class="col-sm-2">
+          <p class="against">Against: {{.FileAgainst}}</p>
+        </figure>
+    </section>
+
+    <section class="container">
+      <div class="row">
+        <figure class="col-sm-12">
+          <label class="ques">Do you think the court will affirm or reverse the decision?</label>
+        </figure>
+      </div>
+    </section>
     <br />
     <br />
-    <div class="btns">
-    <button>Affirm</button>
-    <button>Reverse</button>
-  </div>
+
+    <section class="container">
+      <div class="btns">
+        <figure class="col-sm-12">
+           <button>Affirm</button>
+           <button>Reverse</button>
+        </figure>
+      </div>
+    </section>
+    </div>
+  </header>
 </body>
 
 </html>
