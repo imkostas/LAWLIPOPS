@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,6 +16,8 @@ var Templates = template.Must(template.ParseFiles(
 	"templates/upload.html",
 	"templates/challenges.html",
 	"templates/case.html"))
+
+var local = false
 
 // File struct is used to hold information about a given file on the server
 type File struct {
@@ -65,8 +68,13 @@ func CheckError(w http.ResponseWriter, err error, msg string) {
 // GetCases function searches the test database and cases table with the given search string
 func GetCases(w http.ResponseWriter, r *http.Request, searchString string) []BinaryCase {
 	// Select all from cases table
-	// db, err := sql.Open("mysql", "root:root@/test")
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:8889)/test")
+	var connectionString = ""
+	if local {
+		connectionString = "root:root@tcp(localhost:8889)/test"
+	} else {
+		connectionString = "root:root@/test"
+	}
+	db, err := sql.Open("mysql", connectionString)
 	CheckError(w, err, "Can't open db connection")
 
 	defer db.Close()
@@ -114,13 +122,18 @@ func GetCases(w http.ResponseWriter, r *http.Request, searchString string) []Bin
 
 // GetCase function searches the database for a case with the given case ID
 func GetCase(w http.ResponseWriter, r *http.Request, caseID string) BinaryCase {
-	// Select all from cases table
-	// db, err := sql.Open("mysql", "root:root@/test")
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:8889)/test")
+	var connectionString = ""
+	if local {
+		connectionString = "root:root@tcp(localhost:8889)/test"
+	} else {
+		connectionString = "root:root@/test"
+	}
+	db, err := sql.Open("mysql", connectionString)
 	CheckError(w, err, "Can't open db connection")
 
 	defer db.Close()
 
+	// Select all from cases table
 	stmntOut, err := db.Prepare("SELECT * FROM cases WHERE id = ?")
 	CheckError(w, err, "")
 	defer stmntOut.Close()
@@ -141,6 +154,9 @@ func GetCase(w http.ResponseWriter, r *http.Request, caseID string) BinaryCase {
 }
 
 func main() {
+
+	flag.BoolVar(&local, "local", false, "Defines if the environment is local or not")
+	flag.Parse()
 
 	// r := mux.NewRouter()
 	// r.HandleFunc("/", RootHandler)

@@ -26,8 +26,13 @@ func ChallengesHandler(w http.ResponseWriter, r *http.Request) {
 // UploadHandler function creates a view of uploaded files and handles the upload of files
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Open Database connection
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:8889)/test")
-	// db, err := sql.Open("mysql", "root:root@/test")
+	var connectionString = ""
+	if local {
+		connectionString = "root:root@tcp(localhost:8889)/test"
+	} else {
+		connectionString = "root:root@/test"
+	}
+	db, err := sql.Open("mysql", connectionString)
 	CheckError(w, err, "Can't open db connection")
 
 	defer db.Close()
