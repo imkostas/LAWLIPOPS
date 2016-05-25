@@ -65,18 +65,23 @@ func CheckError(w http.ResponseWriter, err error, msg string) {
 // GetCases function searches the test database and cases table with the given search string
 func GetCases(w http.ResponseWriter, r *http.Request, searchString string) []BinaryCase {
 	// Select all from cases table
-	db, err := sql.Open("mysql", "root:root@/test")
+	// db, err := sql.Open("mysql", "root:root@/test")
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:8889)/test")
 	CheckError(w, err, "Can't open db connection")
 
 	defer db.Close()
+
 	err = db.Ping()
-	CheckError(w, err, "Ping Error")
+	// CheckError(w, err, "Ping Error")
+	if err != nil {
+		panic(err.Error())
+	}
 
 	b := make([]BinaryCase, 0, 0)
 
 	//	rows, err := db.Query("SELECT * FROM cases WHERE title LIKE '%" + searchString + "%'")
 	rows, err := db.Query(searchString)
-	CheckError(w, err, "")
+	CheckError(w, err, "Rows error")
 
 	columns, err := rows.Columns()
 	CheckError(w, err, "Error getting columns")
@@ -110,7 +115,8 @@ func GetCases(w http.ResponseWriter, r *http.Request, searchString string) []Bin
 // GetCase function searches the database for a case with the given case ID
 func GetCase(w http.ResponseWriter, r *http.Request, caseID string) BinaryCase {
 	// Select all from cases table
-	db, err := sql.Open("mysql", "root:root@/test")
+	// db, err := sql.Open("mysql", "root:root@/test")
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:8889)/test")
 	CheckError(w, err, "Can't open db connection")
 
 	defer db.Close()
@@ -129,7 +135,7 @@ func GetCase(w http.ResponseWriter, r *http.Request, caseID string) BinaryCase {
 		&c.Archived,
 		&c.Decision)
 
-	CheckError(w, err, "")
+	CheckError(w, err, "Query Row error")
 
 	return c
 }

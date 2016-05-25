@@ -12,7 +12,7 @@
 .title{
   text-align: center;
   font-family: "Garamond", "advocate-c43";
-  margin-bottom: 5em;
+  /*margin-bottom: 5em;*/
 }
 
 .summary{
@@ -38,17 +38,12 @@
   text-align:center;
 }
 
-
-
 .btns{
   text-align: center;
-  border-radius: 2px;
-  border:0px;
-
 }
 
 .btns.btn-primary{}
 
 .jumbotron{
-
+  border-style: solid;
 }
