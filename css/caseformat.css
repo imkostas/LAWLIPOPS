@@ -38,9 +38,16 @@
   text-align:center;
 }
 
+
+
 .btns{
   text-align: center;
+  border-radius: 2px;
+  border:0px;
+
 }
+
+.btns.btn-primary{}
 
 .jumbotron{
 
