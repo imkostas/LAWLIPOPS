@@ -26,9 +26,13 @@ func ChallengesHandler(w http.ResponseWriter, r *http.Request) {
 // UploadHandler function creates a view of uploaded files and handles the upload of files
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Open Database connection
-	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36:80)/test?tls=skip-verify$autocommit=true")
-	// db, err := sql.Open("mysql", "root:root@/tcp(52.20.186.36)/test")
-	db, err := sql.Open("mysql", "root:root@/test")
+	var connectionString = ""
+	if local {
+		connectionString = "root:root@tcp(localhost:8889)/test"
+	} else {
+		connectionString = "root:root@/test"
+	}
+	db, err := sql.Open("mysql", connectionString)
 	CheckError(w, err, "Can't open db connection")
 
 	defer db.Close()
@@ -40,7 +44,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// varname := "lab"
 	varname := ""
 	rows, err := db.Query("SELECT * FROM data WHERE doc LIKE '%" + varname + "%'")
-	CheckError(w, err, "")
+	CheckError(w, err, "Rows error")
 
 	columns, err := rows.Columns()
 	CheckError(w, err, "Error getting columns")
