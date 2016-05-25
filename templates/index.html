@@ -2,16 +2,23 @@
 <html>
 
 <head>
-	<title>Lawlipops</title>
-	<div>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="../css/indexformat.css">
+	   <title>Lawlipops</title>
+	<div class="top">
 		<h2><a href="/">Lawlipops</a></h2>
 	</div>
 	<hr />
 </head>
 
 <body>
-	<p><a href="/upload">Upload a file</a></p>
-	<h3>Cases</h3>
+	<header class="container">
+		<div class="row">
+			<h1 class="col-sm-13">
+				<div class="upload"><a href="#">Upload a file</a>
+        </div>
+			</h1>
+    <h3>Cases</h3>
 	<ul>
 		{{range .}}
 		<li>
@@ -24,6 +31,7 @@
 	<uL>
 		<!-- TODO: List all of the challenges -->
 	</uL>
+</header>
 </body>
 
 </html>
