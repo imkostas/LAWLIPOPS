@@ -19,6 +19,9 @@ var Templates = template.Must(template.ParseFiles(
 
 var local = false
 
+const localString string = "root:root@tcp(localhost:8889)/test"
+const serverString string = "root:root@/test"
+
 // File struct is used to hold information about a given file on the server
 type File struct {
 	ID   string
@@ -70,9 +73,9 @@ func GetCases(w http.ResponseWriter, r *http.Request, searchString string) []Bin
 	// Select all from cases table
 	var connectionString = ""
 	if local {
-		connectionString = "root:root@tcp(localhost:8889)/test"
+		connectionString = localString
 	} else {
-		connectionString = "root:root@/test"
+		connectionString = serverString
 	}
 	db, err := sql.Open("mysql", connectionString)
 	CheckError(w, err, "Can't open db connection")
@@ -124,9 +127,9 @@ func GetCases(w http.ResponseWriter, r *http.Request, searchString string) []Bin
 func GetCase(w http.ResponseWriter, r *http.Request, caseID string) BinaryCase {
 	var connectionString = ""
 	if local {
-		connectionString = "root:root@tcp(localhost:8889)/test"
+		connectionString = localString
 	} else {
-		connectionString = "root:root@/test"
+		connectionString = serverString
 	}
 	db, err := sql.Open("mysql", connectionString)
 	CheckError(w, err, "Can't open db connection")

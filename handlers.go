@@ -28,9 +28,9 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Open Database connection
 	var connectionString = ""
 	if local {
-		connectionString = "root:root@tcp(localhost:8889)/test"
+		connectionString = localString
 	} else {
-		connectionString = "root:root@/test"
+		connectionString = serverString
 	}
 	db, err := sql.Open("mysql", connectionString)
 	CheckError(w, err, "Can't open db connection")
