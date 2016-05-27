@@ -3,8 +3,12 @@ package main
 import (
 	"database/sql"
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gorilla/mux"
 )
@@ -12,7 +16,40 @@ import (
 // RootHandler function creates the home page view
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	c := GetCases(w, r, "SELECT * FROM cases WHERE archived = 0")
-	Display(w, "index", c)
+
+	session, _ := store.Get(r, "lawlipops")
+
+	val := session.Values["userLoggedIn"]
+	log.Println(val)
+	loggedInString, ok := val.(string)
+	if !ok {
+		// loggedIn = false
+	}
+	loggedIn, _ := strconv.ParseBool(loggedInString)
+
+	val = session.Values["currentUser"]
+	currentUser, ok := val.(User)
+	if !ok {
+		// Blind panic
+	}
+
+	// val = session.Values["test"]
+	// message, ok := val.(string)
+	// if !ok {
+	// 	// Panic
+	// }
+	// log.Println("msg: " + message)
+
+	var p = Page{}
+	// p := Page{Title: "", Body: "", Files: nil, Message: "", Error: "", Cases: nil, CurrentUser: nil, UserLoggedIn: false}
+
+	p.UserLoggedIn = loggedIn
+	p.CurrentUser = currentUser
+	p.Cases = append(p.Cases, c...)
+	// p.UserLoggedIn = false
+	// log.Printf("%v", p)
+	// log.Println(p.UserLoggedIn)
+	Display(w, "index", p)
 }
 
 // ChallengesHandler function creates a view for the challenge with the given id
@@ -25,21 +62,9 @@ func ChallengesHandler(w http.ResponseWriter, r *http.Request) {
 
 // UploadHandler function creates a view of uploaded files and handles the upload of files
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
-	// Open Database connection
-	var connectionString = ""
-	if local {
-		connectionString = localString
-	} else {
-		connectionString = serverString
-	}
-	db, err := sql.Open("mysql", connectionString)
-	CheckError(w, err, "Can't open db connection")
-
-	defer db.Close()
-	err = db.Ping()
-	CheckError(w, err, "Ping Error")
-
 	p := Page{Title: "Upload File", Body: "", Files: nil, Message: ""}
+
+	//TODO: Update db operations to use gorp
 
 	// varname := "lab"
 	varname := ""
@@ -60,15 +85,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		err = rows.Scan(scanArgs...)
 		CheckError(w, err, "")
 
-		// var value string
-		// for i, col := range values {
-		// 	if col == nil {
-		// 		value = "NULL"
-		// 	} else {
-		// 		value = string(col)
-		// 	}
-		// 	fmt.Println(columns[i], ": ", value)
-		// }
 		f := File{ID: "", Path: "", Flag: ""}
 		f.ID = string(values[0])
 		f.Path = string(values[1])
@@ -138,11 +154,66 @@ func CaseIndex(w http.ResponseWriter, r *http.Request) {
 
 // CaseHandler function creates a template for the case with the given id
 func CaseHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	// caseID := r.URL.Path[len("/cases/"):]
-	caseID := vars["id"]
-	// log.Println("caseID: " + caseID)
+	// vars := mux.Vars(r)
+	// caseID := vars["id"]
+	caseID := mux.Vars(r)["id"]
 	caseToDisplay := GetCase(w, r, caseID)
 
 	Display(w, "case", caseToDisplay)
+}
+
+// LoginHandler function
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "lawlipops")
+	CheckError(w, err, "")
+	errorString := ""
+	// Set up bcrypt hash
+	if r.FormValue("register") != "" {
+		user := User{ID: -1, Username: "", Secret: nil, Email: "", Score: -1, Suspended: false}
+		_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
+		if user.ID != -1 {
+			errorString = "Username already taken"
+		} else {
+			secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
+			// TODO: Get seperate username or parse from email
+			user = User{-1, r.FormValue("username"), secret, r.FormValue("username"), 0, false}
+			if err := dbmap.Insert(&user); err != nil {
+				errorString = err.Error()
+			} else {
+				session.Values["userLoggedIn"] = "true"
+				session.Values["currentUser"] = user
+				session.Save(r, w)
+				// session.Values["userLoggedIn"]
+				http.Redirect(w, r, "/", http.StatusFound)
+				return
+			}
+		}
+	} else if r.FormValue("login") != "" {
+		// Validate account credentials
+		// user, err := dbmap.Get(User{}, r.FormValue("username"))
+		var user User
+		err := dbmap.SelectOne(&user, "select * from accounts where username=?", string(r.FormValue("username")))
+		if err != nil {
+			// errorString = err.Error()
+			errorString = "Username or password not recognized"
+		} else if user.Username == "" {
+			errorString = "No such user found with Username: " + r.FormValue("username")
+		} else {
+			if err := bcrypt.CompareHashAndPassword(user.Secret, []byte(r.FormValue("password"))); err != nil {
+				errorString = err.Error()
+			} else {
+				// Login Successful
+				// TODO: Set session vars
+				session.Values["userLoggedIn"] = "true"
+				session.Values["currentUser"] = user
+				session.Save(r, w)
+				http.Redirect(w, r, "/", http.StatusFound)
+				return
+			}
+		}
+	}
+
+	// session.Values["test"] = "good"
+	// session.Save(r, w)
+	Display(w, "login", errorString)
 }

@@ -8,6 +8,9 @@ import (
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/sessions"
+	"github.com/urfave/negroni"
+	"gopkg.in/gorp.v1"
 )
 
 // Templates var holds a cached version of every template
@@ -15,12 +18,36 @@ var Templates = template.Must(template.ParseFiles(
 	"templates/index.html",
 	"templates/upload.html",
 	"templates/challenges.html",
-	"templates/case.html"))
+	"templates/case.html",
+	"templates/login.html"))
 
 var local = false
 
+// var store = sessions.NewCookieStore([]byte("SECRET-CODE-TO-REPLACE"))
+var store = sessions.NewCookieStore([]byte("SECRET-CODE-TO-REPLACE"))
+
 const localString string = "root:root@tcp(localhost:8889)/test"
 const serverString string = "root:root@/test"
+
+var db *sql.DB
+var dbmap *gorp.DbMap
+
+func initDB() {
+	// Set up the database connection
+	var connectionString = ""
+	if local {
+		connectionString = localString
+	} else {
+		connectionString = serverString
+	}
+	db, _ = sql.Open("mysql", connectionString)
+
+	dbmap = &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
+
+	dbmap.AddTableWithName(BinaryCase{}, "cases").SetKeys(true, "ID")
+	dbmap.AddTableWithName(User{}, "accounts").SetKeys(true, "ID")
+	dbmap.CreateTablesIfNotExists()
+}
 
 // File struct is used to hold information about a given file on the server
 type File struct {
@@ -31,22 +58,36 @@ type File struct {
 
 // Page struct holds information needed to Display a page
 type Page struct {
-	Title   string
-	Body    string
-	Files   []File
-	Message string
+	Title        string
+	Body         string
+	Files        []File
+	Message      string
+	Error        string
+	Cases        []BinaryCase
+	CurrentUser  User
+	UserLoggedIn bool
 }
 
 // BinaryCase struct holds information about a case in the database
 type BinaryCase struct {
-	ID          string
-	Title       string
-	Summary     string
-	FileFor     string
-	FileAgainst string
-	Date        string
-	Archived    string
-	Decision    string
+	ID          int64  `db:"id"`
+	Title       string `db:"title"`
+	Summary     string `db:"summary"`
+	FileFor     string `db:"file_for"`
+	FileAgainst string `db:"file_against"`
+	Date        string `db:"date_created"`
+	Archived    string `db:"archived"`
+	Decision    string `db:"decision"`
+}
+
+// User struct contains information about the current user
+type User struct {
+	ID        int64  `db:"id"`
+	Username  string `db:"username"`
+	Secret    []byte `db:"hash"`
+	Email     string `db:"email"`
+	Score     int    `db:"score"`
+	Suspended bool   `db:"suspended"`
 }
 
 // Display function shows a given template with the given data displayed
@@ -55,9 +96,6 @@ func Display(w http.ResponseWriter, name string, data interface{}) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
-	// t, _ := template.ParseFiles("challenges.html")
-	// t.Execute(w, p)
 }
 
 // CheckError function determines if there was an error and displays a message if there was
@@ -69,118 +107,56 @@ func CheckError(w http.ResponseWriter, err error, msg string) {
 }
 
 // GetCases function searches the test database and cases table with the given search string
-func GetCases(w http.ResponseWriter, r *http.Request, searchString string) []BinaryCase {
-	// Select all from cases table
-	var connectionString = ""
-	if local {
-		connectionString = localString
-	} else {
-		connectionString = serverString
-	}
-	db, err := sql.Open("mysql", connectionString)
-	CheckError(w, err, "Can't open db connection")
-
-	defer db.Close()
-
-	err = db.Ping()
-	// CheckError(w, err, "Ping Error")
-	if err != nil {
-		panic(err.Error())
-	}
-
+func GetCases(w http.ResponseWriter, r *http.Request, queryString string) []BinaryCase {
 	b := make([]BinaryCase, 0, 0)
 
-	//	rows, err := db.Query("SELECT * FROM cases WHERE title LIKE '%" + searchString + "%'")
-	rows, err := db.Query(searchString)
-	CheckError(w, err, "Rows error")
-
-	columns, err := rows.Columns()
-	CheckError(w, err, "Error getting columns")
-
-	values := make([]sql.RawBytes, len(columns))
-
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		CheckError(w, err, "")
-
-		c := BinaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
-		c.ID = string(values[0])
-		c.Title = string(values[1])
-		c.Summary = string(values[2])
-		c.FileFor = string(values[3])
-		c.FileAgainst = string(values[4])
-		c.Date = string(values[5])
-		c.Archived = string(values[6])
-		c.Decision = string(values[7])
-		b = append(b, c)
-	}
+	_, err := dbmap.Select(&b, queryString)
+	CheckError(w, err, "dbmap Select error")
 
 	return b
 }
 
 // GetCase function searches the database for a case with the given case ID
 func GetCase(w http.ResponseWriter, r *http.Request, caseID string) BinaryCase {
-	var connectionString = ""
-	if local {
-		connectionString = localString
-	} else {
-		connectionString = serverString
-	}
-	db, err := sql.Open("mysql", connectionString)
-	CheckError(w, err, "Can't open db connection")
-
-	defer db.Close()
+	c := BinaryCase{}
 
 	// Select all from cases table
-	stmntOut, err := db.Prepare("SELECT * FROM cases WHERE id = ?")
-	CheckError(w, err, "")
-	defer stmntOut.Close()
-
-	c := BinaryCase{ID: "", Title: "", Summary: "", FileFor: "", FileAgainst: "", Date: "", Archived: "", Decision: ""}
-	err = stmntOut.QueryRow(caseID).Scan(&c.ID,
-		&c.Title,
-		&c.Summary,
-		&c.FileFor,
-		&c.FileAgainst,
-		&c.Date,
-		&c.Archived,
-		&c.Decision)
-
-	CheckError(w, err, "Query Row error")
+	err := dbmap.SelectOne(&c, "SELECT * FROM cases WHERE id = ?", caseID)
+	CheckError(w, err, "gorp SelectOne error")
 
 	return c
 }
 
-func main() {
+// VerifyDatabase function pings the database to make the application can connect to the database
+func VerifyDatabase(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	if err := db.Ping(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	next(w, r)
+}
 
+func main() {
+	// Check for program flags
 	flag.BoolVar(&local, "local", false, "Defines if the environment is local or not")
 	flag.Parse()
 
-	// r := mux.NewRouter()
-	// r.HandleFunc("/", RootHandler)
-	// r.HandleFunc("/challenges/", ChallengesHandler)
-	// r.HandleFunc("/upload/", UploadHandler)
-	// r.HandleFunc("/cases/{id}", CaseHandler)
-	//
-	// http.Handle("/", r)
+	initDB()
+	defer db.Close()
 
-	// http.HandleFunc("/", RootHandler)
-	// http.HandleFunc("/challenges/", ChallengesHandler)
-	// http.HandleFunc("/upload/", UploadHandler)
-	// http.HandleFunc("/cases/", CaseHandler)
-	// http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
-
+	// Set up Gorilla Mux router
 	r := NewRouter()
 	s := http.StripPrefix("/css/", http.FileServer(http.Dir("./css/")))
+
 	r.PathPrefix("/css/").Handler(s)
-	log.Fatal(http.ListenAndServe(":8000", r))
-	// err := http.ListenAndServe(":8000", r)
-	// if err != nil {
-	// 	log.Fatal("ListenAndServe: ", err)
-	// }
+
+	// Set up and run negroni
+	n := negroni.Classic()
+	n.Use(negroni.HandlerFunc(VerifyDatabase))
+	// store := cookiestore.New([]byte("SECRET-CODE-TO-REPLACE"))
+	// n.Use(sessions.Sessions("lawlipops", store))
+	// TODO: Fix
+
+	n.UseHandler(r)
+	n.Run(":8000")
 }

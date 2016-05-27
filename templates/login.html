@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style media="screen">
+			#login-form > div {
+				text-align: center;
+			}
+
+			#login-form > input {
+				margin: .5em 1em;
+			}
+
+			#error {
+				text-align: center;
+				color: red;
+				margin-top: 1em;
+			}
+		</style>
+		<title>Login</title>
+	</head>
+	<body>
+		<div style="text-align: center;">
+			<h3>Login</h3>
+		</div>
+		<!-- <form id="login-form" method="POST" action="/login"> -->
+		<form id="login-form">
+			<div>
+				<label>Username</label>
+				<input type="text/email" name="username" required="" placeholder="example@domain.com"><br />
+			</div>
+			<div>
+				<label>Password</label>
+				<input type="password" name="password" required=""><br />
+			</div>
+			<div>
+				<input type="submit" name="register" value="Register">
+				<input type="submit" name="login" value="Log in">
+			</div>
+			<div id="error"> {{.}} </div>
+		</form>
+	</body>
+</html>
