@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -20,17 +19,21 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "lawlipops")
 
 	val := session.Values["userLoggedIn"]
-	log.Println(val)
-	loggedInString, ok := val.(string)
+	// log.Println(val)
+	// loggedInString, ok := val.(string)
+	loggedIn, ok := val.(bool)
 	if !ok {
 		// loggedIn = false
 	}
-	loggedIn, _ := strconv.ParseBool(loggedInString)
+	// loggedIn, _ := strconv.ParseBool(loggedInString)
 
 	val = session.Values["currentUser"]
-	currentUser, ok := val.(User)
+	currentUser := &User{}
+	currentUser, ok = val.(*User)
 	if !ok {
 		// Blind panic
+		// log.Fatal("Error getting user")
+
 	}
 
 	// val = session.Values["test"]
@@ -44,7 +47,9 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	// p := Page{Title: "", Body: "", Files: nil, Message: "", Error: "", Cases: nil, CurrentUser: nil, UserLoggedIn: false}
 
 	p.UserLoggedIn = loggedIn
-	p.CurrentUser = currentUser
+	if loggedIn {
+		p.CurrentUser = *currentUser
+	}
 	p.Cases = append(p.Cases, c...)
 	// p.UserLoggedIn = false
 	// log.Printf("%v", p)
@@ -180,9 +185,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			if err := dbmap.Insert(&user); err != nil {
 				errorString = err.Error()
 			} else {
-				session.Values["userLoggedIn"] = "true"
+				session.Values["userLoggedIn"] = true
 				session.Values["currentUser"] = user
-				session.Save(r, w)
+				err := session.Save(r, w)
+				CheckError(w, err, "err")
 				// session.Values["userLoggedIn"]
 				http.Redirect(w, r, "/", http.StatusFound)
 				return
@@ -204,9 +210,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// Login Successful
 				// TODO: Set session vars
-				session.Values["userLoggedIn"] = "true"
+				session.Values["userLoggedIn"] = true
 				session.Values["currentUser"] = user
-				session.Save(r, w)
+				log.Println(user.Username)
+				err := session.Save(r, w)
+				CheckError(w, err, "err")
 				http.Redirect(w, r, "/", http.StatusFound)
 				return
 			}
@@ -216,4 +224,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// session.Values["test"] = "good"
 	// session.Save(r, w)
 	Display(w, "login", errorString)
+}
+
+// LogoutHandler function handles the log out loic
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "lawlipops")
+	// TODO:
+	// Set UserLoggedIn to false
+	session.Values["userLoggedIn"] = false
+	// Set CurrentUser to nil
+	session.Values["currentUser"] = nil
+	err := session.Save(r, w)
+	CheckError(w, err, "err")
+	http.Redirect(w, r, "/", http.StatusFound)
 }

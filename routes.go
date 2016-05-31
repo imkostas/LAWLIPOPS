@@ -53,6 +53,11 @@ var routes = Routes{
 		"POST",
 		"/login",
 		LoginHandler,
+	}, Route{
+		"Logout",
+		"GET",
+		"/logout",
+		LogoutHandler,
 	},
 }
 

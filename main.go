@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/gob"
 	"flag"
 	"html/template"
 	"log"
@@ -33,6 +34,8 @@ var db *sql.DB
 var dbmap *gorp.DbMap
 
 func initDB() {
+	gob.Register(&User{})
+
 	// Set up the database connection
 	var connectionString = ""
 	if local {

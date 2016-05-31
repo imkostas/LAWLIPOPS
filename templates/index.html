@@ -14,6 +14,13 @@
                 Guest
               {{end}}
     </p>
+    <p>
+      {{if .UserLoggedIn}}
+        <a href="/logout">Logout</a>
+      {{else}}
+        <a href="/login">Login</a>
+      {{end}}
+    </p>
 	</div>
 	<hr />
 </head>
