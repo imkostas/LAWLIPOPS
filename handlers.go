@@ -265,27 +265,42 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 		Display(w, "account", p)
 	case "POST":
 		errorString := ""
-		if err := bcrypt.CompareHashAndPassword(p.CurrentUser.Secret, []byte(r.FormValue("currentPassword"))); err != nil {
-			errorString = "Current password field is incorrect"
-		} else {
-			if r.FormValue("newPassword1") == r.FormValue("newPassword2") {
-				// Successful
-				secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("newPassword2")), bcrypt.DefaultCost)
-				p.CurrentUser.Secret = secret
-				// if _, err := dbmap.Update(p.CurrentUser); err != nil {
-				// 	errorString = "Error updating database"
-				// }
-				_, err := dbmap.Exec("UPDATE accounts SET hash=? WHERE id=?", secret, p.CurrentUser.ID)
-				if err != nil {
-					errorString = "Error updating database"
-				}
-				session.Values["currentUser"] = p.CurrentUser
-				session.Save(r, w)
+		if r.FormValue("submit-password") != "" {
+			if err := bcrypt.CompareHashAndPassword(p.CurrentUser.Secret, []byte(r.FormValue("currentPassword"))); err != nil {
+				errorString = "Current password field is incorrect"
 			} else {
-				errorString = "Passwords do not match"
+				if r.FormValue("newPassword1") == r.FormValue("newPassword2") {
+					// Successful
+					secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("newPassword2")), bcrypt.DefaultCost)
+					p.CurrentUser.Secret = secret
+					// if _, err := dbmap.Update(p.CurrentUser); err != nil {
+					// 	errorString = "Error updating database"
+					// }
+					_, err := dbmap.Exec("UPDATE accounts SET hash=? WHERE id=?", secret, p.CurrentUser.ID)
+					if err != nil {
+						errorString = "Error updating database"
+					}
+					session.Values["currentUser"] = p.CurrentUser
+					session.Save(r, w)
+				} else {
+					errorString = "Passwords do not match"
+				}
 			}
 		}
-		log.Println(errorString)
+
+		if r.FormValue("submit-nickname") != "" {
+			p.CurrentUser.Nickname = r.FormValue("nickname")
+			_, err := dbmap.Exec("UPDATE accounts SET nickname=? WHERE id=?", p.CurrentUser.Nickname, p.CurrentUser.ID)
+			if err != nil {
+				errorString = "Error updating database"
+			}
+			session.Values["currentUser"] = p.CurrentUser
+			session.Save(r, w)
+		}
+
+		if errorString != "" {
+			log.Println(errorString)
+		}
 		http.Redirect(w, r, "/account", http.StatusFound)
 		// END POST
 	}

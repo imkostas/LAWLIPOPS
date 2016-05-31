@@ -15,10 +15,18 @@
 			<h2>{{.CurrentUser.Username}}'s Accoun</h2>
 			<!-- TODO: Add account viewing and editing features -->
 			{{with .CurrentUser}}
-				<p>{{.Username}}</p>
-				<p>{{.Email}}</p>
-				<p>{{.Score}}</p>
+				<p>Username: {{.Username}}</p>
+				<p>Email: {{.Email}}</p>
+				<p>Score: {{.Score}}</p>
 			{{end}}
+		</div>
+		<div id="update-nickname">
+			<strong><p>Update Nickname:</p></strong>
+			<form class="" action="/account" method="POST">
+				<label>New Nickname</label>
+				<input type="text" name="nickname" required=""><br />
+				<input type="submit" name="submit-nickname" value="Submit">
+			</form>
 		</div>
 		<div id="update-password">
 			<strong><p>Update Password:</p></strong>
@@ -29,7 +37,7 @@
 				<input type="password" name="newPassword1" required=""><br />
 				<label>Confirm New Password</label><br />
 				<input type="password" name="newPassword2" required=""><br />
-				<input type="submit" name="submit" value="Submit">
+				<input type="submit" name="submit-password" value="Submit">
 			</form>
 		</div>
 	</body>
