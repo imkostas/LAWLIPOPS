@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -34,13 +35,6 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 		// log.Fatal("Error getting user")
 
 	}
-
-	// val = session.Values["test"]
-	// message, ok := val.(string)
-	// if !ok {
-	// 	// Panic
-	// }
-	// log.Println("msg: " + message)
 
 	var p = Page{}
 	// p := Page{Title: "", Body: "", Files: nil, Message: "", Error: "", Cases: nil, CurrentUser: nil, UserLoggedIn: false}
@@ -173,14 +167,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	errorString := ""
 	// Set up bcrypt hash
 	if r.FormValue("register") != "" {
-		user := User{ID: -1, Username: "", Secret: nil, Email: "", Score: -1, Suspended: false}
+		user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
 		_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
 		if user.ID != -1 {
 			errorString = "Username already taken"
 		} else {
 			secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
 			// TODO: Get seperate username or parse from email
-			user = User{-1, r.FormValue("username"), secret, r.FormValue("username"), 0, false}
+			user = User{-1, r.FormValue("username"), r.FormValue("username"), secret, r.FormValue("username"), 0, false}
 			if err := dbmap.Insert(&user); err != nil {
 				errorString = err.Error()
 			} else {
@@ -235,4 +229,64 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	err := session.Save(r, w)
 	CheckError(w, err, "err")
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+// AccountHandler function displays a users account page
+func AccountHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "lawlipops")
+
+	val := session.Values["userLoggedIn"]
+	loggedIn, ok := val.(bool)
+	if !ok {
+		log.Println("Error getting userLoggedIn value")
+	}
+
+	val = session.Values["currentUser"]
+	currentUser := &User{}
+	currentUser, ok = val.(*User)
+	if !ok {
+		log.Println("Error getting current user")
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	p := Page{}
+	p.CurrentUser = *currentUser
+	p.UserLoggedIn = loggedIn
+
+	if !loggedIn {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	switch r.Method {
+	case "GET":
+		// Display account information
+		Display(w, "account", p)
+	case "POST":
+		errorString := ""
+		if err := bcrypt.CompareHashAndPassword(p.CurrentUser.Secret, []byte(r.FormValue("currentPassword"))); err != nil {
+			errorString = "Current password field is incorrect"
+		} else {
+			if r.FormValue("newPassword1") == r.FormValue("newPassword2") {
+				// Successful
+				secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("newPassword2")), bcrypt.DefaultCost)
+				p.CurrentUser.Secret = secret
+				// if _, err := dbmap.Update(p.CurrentUser); err != nil {
+				// 	errorString = "Error updating database"
+				// }
+				_, err := dbmap.Exec("UPDATE accounts SET hash=? WHERE id=?", secret, p.CurrentUser.ID)
+				if err != nil {
+					errorString = "Error updating database"
+				}
+				session.Values["currentUser"] = p.CurrentUser
+				session.Save(r, w)
+			} else {
+				errorString = "Passwords do not match"
+			}
+		}
+		log.Println(errorString)
+		http.Redirect(w, r, "/account", http.StatusFound)
+		// END POST
+	}
 }

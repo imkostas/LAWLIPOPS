@@ -14,9 +14,10 @@
                 Guest
               {{end}}
     </p>
+    {{if .UserLoggedIn}}<p>Score: {{.CurrentUser.Score}}</p>{{end}}
     <p>
       {{if .UserLoggedIn}}
-        <a href="/logout">Logout</a>
+        <a href="/logout">Logout</a>  <a href="/account">Account</a>
       {{else}}
         <a href="/login">Login</a>
       {{end}}

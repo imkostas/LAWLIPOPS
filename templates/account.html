@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My Account</title>
+		<div>
+      <h2><a href="/">LAWliPOPS</a></h2>
+    </div>
+	</head>
+	<body>
+		<div>
+			<p>{{.Error}}</p>
+		</div>
+		<div>
+			<h2>{{.CurrentUser.Username}}'s Accoun</h2>
+			<!-- TODO: Add account viewing and editing features -->
+			{{with .CurrentUser}}
+				<p>{{.Username}}</p>
+				<p>{{.Email}}</p>
+				<p>{{.Score}}</p>
+			{{end}}
+		</div>
+		<div id="update-password">
+			<strong><p>Update Password:</p></strong>
+			<form class="" action="/account" method="POST">
+				<label>Current Password</label><br />
+				<input type="password" name="currentPassword" required=""><br />
+				<label>New Password</label><br />
+				<input type="password" name="newPassword1" required=""><br />
+				<label>Confirm New Password</label><br />
+				<input type="password" name="newPassword2" required=""><br />
+				<input type="submit" name="submit" value="Submit">
+			</form>
+		</div>
+	</body>
+</html>
