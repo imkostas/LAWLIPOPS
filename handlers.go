@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -212,7 +211,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				// TODO: Set session vars
 				session.Values["userLoggedIn"] = true
 				session.Values["currentUser"] = user
-				log.Println(user.Username)
 				err := session.Save(r, w)
 				CheckError(w, err, "err")
 				http.Redirect(w, r, "/", http.StatusFound)
