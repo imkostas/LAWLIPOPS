@@ -45,10 +45,17 @@
 				<input type="password" name="password" required=""><br />
 			</div>
 			<div>
-				<input type="submit" name="register" value="Register">
-				<input type="submit" name="login" value="Log in">
+				<button type="submit" class="btn btn-primary" name="login" value="Log in">Login</button>
+				<!-- <button type="submit" class="btn btn-default">Cancel</button> -->
+				<a class="btn btn-default" href="/" role="button">Cancel</a>
 			</div>
-			<div id="error"> {{.Error}} </div>
+			<div id="error" class="alert alert-danger" role="alert"> {{.Error}} </div>
+			<div class="">
+				- OR -
+				<br />
+				<br />
+				<a class="btn btn-default" role="button" href="/register">Register</a>
+			</div>
 		</form>
 	</body>
 </html>

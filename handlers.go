@@ -42,7 +42,6 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	if loggedIn {
 		p.CurrentUser = *currentUser
 	}
-	log.Println(p.UserLoggedIn)
 	p.Cases = append(p.Cases, c...)
 	// p.UserLoggedIn = false
 	// log.Printf("%v", p)
@@ -188,28 +187,28 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	errorString := ""
 	// Set up bcrypt hash
-	if r.FormValue("register") != "" {
-		user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
-		_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
-		if user.ID != -1 {
-			errorString = "Username already taken"
-		} else {
-			secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
-			// TODO: Get seperate username or parse from email
-			user = User{-1, r.FormValue("username"), r.FormValue("username"), secret, r.FormValue("username"), 0, false}
-			if err := dbmap.Insert(&user); err != nil {
-				errorString = err.Error()
-			} else {
-				session.Values["userLoggedIn"] = true
-				session.Values["currentUser"] = user
-				err := session.Save(r, w)
-				CheckError(w, err, "err")
-				// session.Values["userLoggedIn"]
-				http.Redirect(w, r, "/", http.StatusFound)
-				return
-			}
-		}
-	} else if r.FormValue("login") != "" {
+	// if r.FormValue("register") != "" {
+	// 	user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
+	// 	_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
+	// 	if user.ID != -1 {
+	// 		errorString = "Username already taken"
+	// 	} else {
+	// 		secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
+	// 		// TODO: Get seperate username or parse from email
+	// 		user = User{-1, r.FormValue("username"), r.FormValue("username"), secret, r.FormValue("username"), 0, false}
+	// 		if err := dbmap.Insert(&user); err != nil {
+	// 			errorString = err.Error()
+	// 		} else {
+	// 			session.Values["userLoggedIn"] = true
+	// 			session.Values["currentUser"] = user
+	// 			err := session.Save(r, w)
+	// 			CheckError(w, err, "err")
+	// 			// session.Values["userLoggedIn"]
+	// 			http.Redirect(w, r, "/", http.StatusFound)
+	// 			return
+	// 		}
+	// 	}
+	/*} else */ if r.FormValue("login") != "" {
 		// Validate account credentials
 		// user, err := dbmap.Get(User{}, r.FormValue("username"))
 		var user User
@@ -337,4 +336,64 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 	// 	p.Error = ""
 	// }
 	Display(w, "account", p)
+}
+
+// RegisterHandler function handles the displaying and logic of the register form
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "lawlipops")
+
+	val := session.Values["userLoggedIn"]
+	loggedIn, ok := val.(bool)
+	if !ok {
+		log.Println("Error getting userLoggedIn value")
+	}
+
+	val = session.Values["currentUser"]
+	currentUser := &User{}
+	currentUser, ok = val.(*User)
+	if !ok {
+		log.Println("Error getting current user")
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	p := Page{}
+	p.CurrentUser = *currentUser
+	p.UserLoggedIn = loggedIn
+
+	if !loggedIn {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+	errorString := ""
+
+	if r.FormValue("submit") != "" {
+		user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
+		_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
+		if user.ID != -1 {
+			errorString = "Username already taken"
+		} else {
+			secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
+			// TODO: Get seperate username or parse from email
+			if r.FormValue("nickname") != "" {
+				user = User{-1, r.FormValue("username"), r.FormValue("nickname"), secret, r.FormValue("email"), 0, false}
+			} else {
+				user = User{-1, r.FormValue("username"), r.FormValue("username"), secret, r.FormValue("email"), 0, false}
+			}
+			if err := dbmap.Insert(&user); err != nil {
+				errorString = err.Error()
+			} else {
+				session.Values["userLoggedIn"] = true
+				session.Values["currentUser"] = user
+				err := session.Save(r, w)
+				CheckError(w, err, "err")
+				// session.Values["userLoggedIn"]
+				http.Redirect(w, r, "/", http.StatusFound)
+				return
+			}
+		}
+	}
+
+	p.Error = errorString
+	Display(w, "register", p)
 }
