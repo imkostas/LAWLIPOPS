@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <title>Upload</title>
-    <link rel="stylesheet" type="text/css" href="../css/uploadformat.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../css/uploadformat.css">
 </head>
 
 <body>
@@ -25,9 +25,9 @@
           <!-- <li><a href="/cases">Cases</a></li>
           <li><a href="/challenges">Challenges</a></li> -->
         </ul>
-        <ul class="nav navbar-nav navbar-right" display:inline>
-          {{if .UserLoggedIn}}<p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>{{end}}
-          {{if .UserLoggedIn}}<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>{{end}}
+        <ul class="nav navbar-nav navbar-right">
+          <!-- {{if .UserLoggedIn}}<p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>{{end}} -->
+          <!-- {{if .UserLoggedIn}}<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>{{end}} -->
           <!-- <p>
             {{if .UserLoggedIn}}
               <a href="/logout">Logout</a>  <a href="/account">Account</a>
@@ -35,12 +35,12 @@
               <a href="/login">Login</a>
             {{end}}
           </p> -->
-          {{if .UserLoggedIn}}
+          <!-- {{if .UserLoggedIn}} -->
           <li><a href="/account">My Account</a></li>
           <li><a href="/logout">Log out</a></li>
-          {{else}}
+          <!-- {{else}} -->
           <li><a href="/login">Login</a></li>
-          {{end}}
+          <!-- {{end}} -->
         </ul>
       </div><!-- /.navbar-collapse -->
     </div>
