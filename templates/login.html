@@ -3,14 +3,19 @@
 	<head>
 		<meta charset="utf-8">
 		<style media="screen">
+
 		  #login-form{
-		 	  position: absolute;
-        width: 300px;
-        height: 200px;
+		 	  position: fixed;
+        width: 350px;
+        height: 400px;
         z-index: 15;
-        top: 50%;
+        top: 25%;
         left: 50%;
         margin: -100px 0 0 -150px;
+				border: groove 1px #d3d3d3;
+				border-radius: 4px;
+				padding: 20px;
+				background-color: #fafafa;
 		  }
 
 			#login-form > div {
@@ -32,20 +37,32 @@
 			}
 
 			#fbbtn{
-				margin-top: 1em;
+				margin-top: 5em;
+			}
+
+			.btn-primary.active {
+        color: #ffffff;
+        background-color: #3276b1;
+        border-color: #285e8e;
+      }
+
+			h1{
+				text-align: center;
 			}
 
 		</style>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
-		<title>Login</title>
+		<title>Sign in</title>
 	</head>
 	<body>
+
 		<div style="text-align: center;">
 		</div>
+		<div><h1><a class="navbar-brand" href="/">LAWliPOPS</a><h1></div>
 		<!-- <form id="login-form" method="POST" action="/login"> -->
 		<form id="login-form">
 			<div>
-				<h3>Login</h3>
+				<h1>Sign in</h1>
 				<label></label>
 				  <div class="input-group">
             <span class="input-group-addon" id="basic-addon1">Username</span>
@@ -66,7 +83,7 @@
 
 			</div>
 			<div id="fbbtn">
-			<button type="button" class="btn btn-primary" color:#435a8b>Sign in with Facebook</button>
+			<button type="button" class="btn btn-primary">Sign in with Facebook</button>
 		</div>
 			<!-- <div id="error"> {{.Error}} </div> -->
 		</form>
