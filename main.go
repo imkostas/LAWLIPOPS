@@ -21,7 +21,8 @@ var Templates = template.Must(template.ParseFiles(
 	"templates/challenges.html",
 	"templates/case.html",
 	"templates/login.html",
-	"templates/account.html"))
+	"templates/account.html",
+	"templates/navbar.html"))
 
 var local = false
 
@@ -101,6 +102,7 @@ func Display(w http.ResponseWriter, name string, data interface{}) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 }
 
 // CheckError function determines if there was an error and displays a message if there was

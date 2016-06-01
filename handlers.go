@@ -38,11 +38,11 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 
 	var p = Page{}
 	// p := Page{Title: "", Body: "", Files: nil, Message: "", Error: "", Cases: nil, CurrentUser: nil, UserLoggedIn: false}
-
 	p.UserLoggedIn = loggedIn
 	if loggedIn {
 		p.CurrentUser = *currentUser
 	}
+	log.Println(p.UserLoggedIn)
 	p.Cases = append(p.Cases, c...)
 	// p.UserLoggedIn = false
 	// log.Printf("%v", p)
@@ -164,6 +164,28 @@ func CaseHandler(w http.ResponseWriter, r *http.Request) {
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := store.Get(r, "lawlipops")
 	CheckError(w, err, "")
+
+	val := session.Values["userLoggedIn"]
+	loggedIn, _ := val.(bool)
+	// if !ok {
+	// }
+
+	val = session.Values["currentUser"]
+	currentUser := &User{}
+	currentUser, _ = val.(*User)
+	// if !ok {
+	// 	// Blind panic
+	// 	// log.Fatal("Error getting user")
+	//
+	// }
+
+	var p = Page{}
+	// p := Page{Title: "", Body: "", Files: nil, Message: "", Error: "", Cases: nil, CurrentUser: nil, UserLoggedIn: false}
+	p.UserLoggedIn = loggedIn
+	if loggedIn {
+		p.CurrentUser = *currentUser
+	}
+
 	errorString := ""
 	// Set up bcrypt hash
 	if r.FormValue("register") != "" {
@@ -215,7 +237,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// session.Values["test"] = "good"
 	// session.Save(r, w)
-	Display(w, "login", errorString)
+	p.Error = errorString
+	Display(w, "login", p)
 }
 
 // LogoutHandler function handles the log out loic
@@ -259,12 +282,13 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	errorString := ""
+
 	switch r.Method {
 	case "GET":
-		// Display account information
-		Display(w, "account", p)
+	// Display account information
+	// Display(w, "account", p)
 	case "POST":
-		errorString := ""
 		if r.FormValue("submit-password") != "" {
 			if err := bcrypt.CompareHashAndPassword(p.CurrentUser.Secret, []byte(r.FormValue("currentPassword"))); err != nil {
 				errorString = "Current password field is incorrect"
@@ -282,6 +306,7 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 					}
 					session.Values["currentUser"] = p.CurrentUser
 					session.Save(r, w)
+					p.Message = "Password update successful"
 				} else {
 					errorString = "Passwords do not match"
 				}
@@ -296,12 +321,20 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			session.Values["currentUser"] = p.CurrentUser
 			session.Save(r, w)
+			p.Message = "Nickname update successful"
 		}
 
-		if errorString != "" {
-			log.Println(errorString)
-		}
-		http.Redirect(w, r, "/account", http.StatusFound)
+		// http.Redirect(w, r, "/account", http.StatusFound)
+		// return
 		// END POST
+	default:
+		http.Redirect(w, r, "/", http.StatusForbidden)
 	}
+
+	// if errorString != "" {
+	p.Error = errorString
+	// } else {
+	// 	p.Error = ""
+	// }
+	Display(w, "account", p)
 }

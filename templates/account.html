@@ -3,42 +3,51 @@
 	<head>
 		<meta charset="utf-8">
 		<title>My Account</title>
-		<div>
+		<!-- <div>
       <h2><a href="/">LAWliPOPS</a></h2>
-    </div>
+    </div> -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	</head>
 	<body>
-		<div>
-			<p>{{.Error}}</p>
-		</div>
-		<div>
-			<h2>{{.CurrentUser.Username}}'s Accoun</h2>
-			<!-- TODO: Add account viewing and editing features -->
-			{{with .CurrentUser}}
-				<p>Username: {{.Username}}</p>
-				<p>Email: {{.Email}}</p>
-				<p>Score: {{.Score}}</p>
-			{{end}}
-		</div>
-		<div id="update-nickname">
-			<strong><p>Update Nickname:</p></strong>
-			<form class="" action="/account" method="POST">
-				<label>New Nickname</label>
-				<input type="text" name="nickname" required=""><br />
-				<input type="submit" name="submit-nickname" value="Submit">
-			</form>
-		</div>
-		<div id="update-password">
-			<strong><p>Update Password:</p></strong>
-			<form class="" action="/account" method="POST">
-				<label>Current Password</label><br />
-				<input type="password" name="currentPassword" required=""><br />
-				<label>New Password</label><br />
-				<input type="password" name="newPassword1" required=""><br />
-				<label>Confirm New Password</label><br />
-				<input type="password" name="newPassword2" required=""><br />
-				<input type="submit" name="submit-password" value="Submit">
-			</form>
+		<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
+		<!-- Navbar code -->
+		<!-- END Navbar code -->
+		<div class="container">
+			<div>
+				<p style="color: red;">{{.Error}}</p>
+				<p style="color: green;">{{.Message}}</p>
+			</div>
+			<div>
+				<h2>{{.CurrentUser.Nickname}}'s Account</h2>
+				<!-- TODO: Add account viewing and editing features -->
+				{{with .CurrentUser}}
+					<p>Username: {{.Username}}</p>
+					<p>Email: {{.Email}}</p>
+					<p>Score: {{.Score}}</p>
+				{{end}}
+			</div>
+			<hr />
+			<div id="update-nickname">
+				<strong><p>Update Nickname:</p></strong>
+				<form class="" action="/account" method="POST">
+					<label>New Nickname</label>
+					<input type="text" name="nickname" required=""><br />
+					<input type="submit" name="submit-nickname" value="Submit">
+				</form>
+			</div>
+			<hr />
+			<div id="update-password">
+				<strong><p>Update Password:</p></strong>
+				<form class="" action="/account" method="POST">
+					<label>Current Password</label><br />
+					<input type="password" name="currentPassword" required=""><br />
+					<label>New Password</label><br />
+					<input type="password" name="newPassword1" required=""><br />
+					<label>Confirm New Password</label><br />
+					<input type="password" name="newPassword2" required=""><br />
+					<input type="submit" name="submit-password" value="Submit">
+				</form>
+			</div>
 		</div>
 	</body>
 </html>
