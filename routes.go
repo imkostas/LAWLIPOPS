@@ -25,6 +25,12 @@ var routes = Routes{
 		RootHandler,
 	},
 	Route{
+		"Index",
+		"POST",
+		"/",
+		RootHandler,
+	},
+	Route{
 		"Case",
 		"GET",
 		"/cases/{id}",
