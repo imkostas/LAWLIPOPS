@@ -15,6 +15,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const emptyFileString = "(empty)"
+
 // RootHandler function creates the home page view
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	var p = Page{}
@@ -41,14 +43,14 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 				c.FileFor = r.FormValue("file-for")
 			} else {
 				// CHANGE TO THROW Error
-				c.FileFor = "(TEXT)"
+				c.FileFor = emptyFileString
 			}
 
 			if r.FormValue("file-against") != "" {
 				c.FileAgainst = r.FormValue("file-against")
 			} else {
 				// CHANGE TO THROW Error
-				c.FileAgainst = "(TEXT)"
+				c.FileAgainst = emptyFileString
 			}
 
 			// Update cases database
@@ -59,32 +61,29 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 				p.Message = "New case added successfuly!"
 			}
 		} else if r.FormValue("affirm") != "" {
-			// log.Println(r.FormValue("affirm"))
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
 			dbmap.Exec("UPDATE cases SET decision=? WHERE id=?", 1, id)
 		} else if r.FormValue("reverse") != "" {
-			// log.Println(r.FormValue("reverse"))
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
 			dbmap.Exec("UPDATE cases SET decision=? WHERE id=?", 2, id)
 		} else if r.FormValue("delete") != "" {
-			// log.Println(r.FormValue("delete"))
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
 			dbmap.Exec("DELETE FROM cases WHERE id=?", id)
 		} else if r.FormValue("save") != "" {
-			// TODO: Finish this
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("save"), "-")[1], 10, 64)
 			fileFor := ""
 			fileAgainst := ""
-			if r.FormValue("file-for") == "" {
-				fileFor = "(TEXT)"
-			} else {
+			if r.FormValue("file-for") != "" {
 				fileFor = r.FormValue("file-for")
+			} else {
+				fileFor = emptyFileString
 			}
 
-			if r.FormValue("file-against") == "" {
-				fileAgainst = "(TEXT)"
-			} else {
+			if r.FormValue("file-against") != "" {
 				fileAgainst = r.FormValue("file-against")
+			} else {
+
+				fileAgainst = emptyFileString
 			}
 
 			dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), fileFor, fileAgainst, id)
