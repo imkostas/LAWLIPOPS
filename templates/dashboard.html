@@ -9,7 +9,7 @@
 		<div class="container">
 			<h2>Admin Dashboard</h2>
 			<h4>Cases</h4>
-			<form id="dashboard" class="form-inline" action="/" method="POST">
+			<!-- <form id="dashboard" class="form-inline" action="/" method="POST"> -->
 				<table class="table table-hover table-bordered">
 					<thead>
 						<tr>
@@ -19,25 +19,73 @@
 							<th>File For</th>
 							<th>File Against</th>
 							<th>Decision</th>
+							<th>Edit</th>
+							<th>View</th>
 							<th><span class="glyphicon glyphicon-trash"></span></th>
 						</tr>
 					</thead>
 					<tbody>
 						{{range $cases := .Cases}}
-						<tr>
-							<td>{{$cases.ID}}</td>
-							<td>{{$cases.Date}}</td>
-							<td>{{$cases.Title}}</td>
-							<td>{{$cases.FileFor}}</td>
-							<td>{{$cases.FileAgainst}}</td>
-							<td>
-								<button type="submit" class="btn btn-success btn-xs" name="affirm" value="affirm-{{$cases.ID}}" aria-label="affirm" form="dashboard"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
-								<button type="submit" class="btn btn-warning btn-xs" name="reverse" value="reverse-{{$cases.ID}}" aria-label="reverse" form="dashboard"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-							</td>
-							<td>
-								<button type="submit" class="btn btn-danger btn-xs" name="delete" value="delete-{{$cases.ID}}" aria-label="delete" form="dashboard"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
-							</td>
-						</tr>
+							<tr>
+								<td>{{$cases.ID}}</td>
+								<td>{{$cases.Date}}</td>
+								<td>{{$cases.Title}}</td>
+								<td>{{$cases.FileFor}}</td>
+								<td>{{$cases.FileAgainst}}</td>
+								<td>
+									<form id="dashboard" class="form-inline" action="/" method="POST">
+										<button type="submit" class="btn btn-success btn-xs" name="affirm" value="affirm-{{$cases.ID}}" aria-label="affirm" form="dashboard"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+										<button type="submit" class="btn btn-warning btn-xs" name="reverse" value="reverse-{{$cases.ID}}" aria-label="reverse" form="dashboard"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+									</form>
+								</td>
+								<td>
+									<!-- <form id="dashboard" class="form-inline" action="/" method="POST"> -->
+										<button type="button" class="btn btn-info btn-xs edit" name="show-edit" aria-label="edit" onclick="showEditForm(event)">Edit</button>
+									<!-- </form> -->
+								</td>
+								<td>
+									<a class="btn btn-default btn-xs" role="button" href="/cases/{{$cases.ID}}">View</a>
+								</td>
+								<td>
+									<form id="dashboard" class="form-inline" action="/" method="POST">
+										<button type="submit" class="btn btn-danger btn-xs" name="delete" value="delete-{{$cases.ID}}" aria-label="delete" form="dashboard"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+									</form>
+								</td>
+							</tr>
+							<tr class="collapse out">
+								<form class="form-inline" action="/" method="POST">
+									<td>
+										Editing: {{$cases.Title}}
+									</td>
+									<td>
+										<div class="form-group">
+									    <label class="control-label" for="title">Title</label>
+									    <input type="text" class="form-control" name="title" value="{{$cases.Title}}">
+									  </div>
+									</td>
+									<td>
+										<div class="form-group">
+									    <label class="control-label" for="summary">Summary</label>
+									    <input type="text" class="form-control" name="summary" value="{{$cases.Summary}}">
+									  </div>
+									</td>
+									<td>
+										<div class="form-group">
+											<label class="control-label" for="file-for">File For</label>
+											<input type="file" name="file-for" id="file-for">
+										</div>
+									</td>
+									<td>
+										<div class="form-group">
+											<label class="control-label" for="file-against">File Against</label>
+											<input type="file" name="file-against" id="file-against">
+										</div>
+									</td>
+									<td>
+										<button class="btn btn-primary" type="submit" name="save" value="save-{{$cases.ID}}">Save</button>
+									</td>
+								<!-- </form> -->
+							</tr>
 						{{end}}
 						<!-- <tr class="success">
 							<td>
@@ -61,7 +109,7 @@
 						</tr> -->
 					</tbody>
 				</table>
-				<button onclick="showHideForm()" type="button" name="add-case" id="add-case" class="btn btn-success"><span id="add-span" class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+				<button onclick="showHideForm()" type="button" name="add-case" id="add-case" class="btn btn-success"><span id="add-span" class="glyphicon glyphicon-plus" aria-hidden="true"></span> Case</button>
 			</form>
 			<form class="form-horizontal" id="new-case" action="/" method="post">
 				<div class="form-group">
@@ -124,24 +172,39 @@
 			</form> -->
 		</div>
 		<script type="text/javascript">
-			button = document.getElementById('add-case')
-			buttonSpan = document.getElementById('add-span');
-			form = document.getElementById('new-case');
-			form.style.visibility = "hidden";
-			formVisible = true;
+			addButton = document.getElementById('add-case')
+			addButtonSpan = document.getElementById('add-span');
+			newCaseForm = document.getElementById('new-case');
+			newCaseForm.style.visibility = "hidden";
+			newCaseFormVisible = true;
+
+			// editButtons[] = document.getElementsByClassName('edit')
+			// for (var i = 0; i < editButtons.length; i++) {
+			// 	editButtons[i].addEventListener("click", showEditForm)
+			// }
 
 			function showHideForm(){
-				console.log(formVisible);
-				if (formVisible) {
-					form.style.visibility = "visible"
-					button.className = "btn btn-danger"
-					buttonSpan.className = "glyphicon glyphicon-minus"
+				console.log(newCaseFormVisible);
+				if (newCaseFormVisible) {
+					newCaseForm.style.visibility = "visible"
+					addButton.className = "btn btn-danger"
+					addButtonSpan.className = "glyphicon glyphicon-minus"
 				} else {
-					form.style.visibility = "hidden"
-					button.className = "btn btn-success"
-					buttonSpan.className = "glyphicon glyphicon-plus"
+					newCaseForm.style.visibility = "hidden"
+					addButton.className = "btn btn-success"
+					addButtonSpan.className = "glyphicon glyphicon-plus"
 				}
-				formVisible = !formVisible
+				newCaseFormVisible = !newCaseFormVisible
+			}
+
+			function showEditForm(e){
+				// console.log(e);
+				formRow = e.path[2].nextElementSibling;
+				if (formRow.className == "collapse in") {
+					formRow.className = "collapse out"
+				} else {
+					formRow.className = "collapse in"
+				}
 			}
 
 		</script>

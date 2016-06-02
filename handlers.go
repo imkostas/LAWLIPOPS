@@ -70,6 +70,24 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 			// log.Println(r.FormValue("delete"))
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
 			dbmap.Exec("DELETE FROM cases WHERE id=?", id)
+		} else if r.FormValue("save") != "" {
+			// TODO: Finish this
+			id, _ := strconv.ParseInt(strings.Split(r.FormValue("save"), "-")[1], 10, 64)
+			fileFor := ""
+			fileAgainst := ""
+			if r.FormValue("file-for") == "" {
+				fileFor = "(TEXT)"
+			} else {
+				fileFor = r.FormValue("file-for")
+			}
+
+			if r.FormValue("file-against") == "" {
+				fileAgainst = "(TEXT)"
+			} else {
+				fileAgainst = r.FormValue("file-against")
+			}
+
+			dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), fileFor, fileAgainst, id)
 		}
 	}
 
