@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -14,39 +17,94 @@ import (
 
 // RootHandler function creates the home page view
 func RootHandler(w http.ResponseWriter, r *http.Request) {
+	var p = Page{}
+	errorString := ""
+
+	if r.Method == "POST" {
+		if r.FormValue("submitNewCase") != "" {
+			c := BinaryCase{}
+			// TODO:
+			// Validate form
+			if r.FormValue("title") != "" {
+				c.Title = r.FormValue("title")
+			} else {
+				errorString = "Error: Please enter a title"
+			}
+
+			if r.FormValue("summary") != "" {
+				c.Summary = r.FormValue("summary")
+			} else {
+				errorString = "Error: Please enter a summary"
+			}
+
+			if r.FormValue("file-for") != "" {
+				c.FileFor = r.FormValue("file-for")
+			} else {
+				// CHANGE TO THROW Error
+				c.FileFor = "(TEXT)"
+			}
+
+			if r.FormValue("file-against") != "" {
+				c.FileAgainst = r.FormValue("file-against")
+			} else {
+				// CHANGE TO THROW Error
+				c.FileAgainst = "(TEXT)"
+			}
+
+			// Update cases database
+			if errorString == "" {
+				c.Date = time.Now().UTC().Format("2006-01-02")
+				err := dbmap.Insert(&c)
+				CheckError(w, err, "Insert error")
+				p.Message = "New case added successfuly!"
+			}
+		} else if r.FormValue("affirm") != "" {
+			// log.Println(r.FormValue("affirm"))
+			id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
+			dbmap.Exec("UPDATE cases SET decision=? WHERE id=?", 1, id)
+		} else if r.FormValue("reverse") != "" {
+			// log.Println(r.FormValue("reverse"))
+			id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
+			dbmap.Exec("UPDATE cases SET decision=? WHERE id=?", 2, id)
+		} else if r.FormValue("delete") != "" {
+			// log.Println(r.FormValue("delete"))
+			id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
+			dbmap.Exec("DELETE FROM cases WHERE id=?", id)
+		}
+	}
+
 	c := GetCases(w, r, "SELECT * FROM cases WHERE archived = 0")
 
 	session, _ := store.Get(r, "lawlipops")
 
 	val := session.Values["userLoggedIn"]
-	// log.Println(val)
-	// loggedInString, ok := val.(string)
-	loggedIn, ok := val.(bool)
-	if !ok {
-		// loggedIn = false
-	}
+	loggedIn, _ := val.(bool)
+	// if !ok {
+	// 	loggedIn = false
+	// }
 	// loggedIn, _ := strconv.ParseBool(loggedInString)
 
 	val = session.Values["currentUser"]
 	currentUser := &User{}
-	currentUser, ok = val.(*User)
-	if !ok {
-		// Blind panic
-		// log.Fatal("Error getting user")
+	currentUser, _ = val.(*User)
+	// if !ok {
+	// 	// Blind panic
+	// 	// log.Fatal("Error getting user")
+	//
+	// }
 
-	}
-
-	var p = Page{}
-	// p := Page{Title: "", Body: "", Files: nil, Message: "", Error: "", Cases: nil, CurrentUser: nil, UserLoggedIn: false}
 	p.UserLoggedIn = loggedIn
 	if loggedIn {
 		p.CurrentUser = *currentUser
 	}
 	p.Cases = append(p.Cases, c...)
-	// p.UserLoggedIn = false
-	// log.Printf("%v", p)
-	// log.Println(p.UserLoggedIn)
-	Display(w, "index", p)
+	p.Error = errorString
+
+	if p.CurrentUser.Username == "chris@test.com" {
+		Display(w, "dashboard", p)
+	} else {
+		Display(w, "index", p)
+	}
 }
 
 // ChallengesHandler function creates a view for the challenge with the given id
@@ -141,12 +199,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-}
-
-// CaseIndex function creates a template view for every case
-func CaseIndex(w http.ResponseWriter, r *http.Request) {
-	// c := GetCases(w, r, "SELECT * FROM cases WHERE archived = 0")
-	// w.Write(c)
 }
 
 // CaseHandler function creates a template for the case with the given id

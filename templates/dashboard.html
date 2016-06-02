@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Dashboard</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
+	</head>
+	<body>
+		<div class="container">
+			<h2>Admin Dashboard</h2>
+			<h4>Cases</h4>
+			<form id="dashboard" class="form-inline" action="/" method="POST">
+				<table class="table table-hover table-bordered">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Date</th>
+							<th>Title</th>
+							<th>File For</th>
+							<th>File Against</th>
+							<th>Decision</th>
+							<th><span class="glyphicon glyphicon-trash"></span></th>
+						</tr>
+					</thead>
+					<tbody>
+						{{range $cases := .Cases}}
+						<tr>
+							<td>{{$cases.ID}}</td>
+							<td>{{$cases.Date}}</td>
+							<td>{{$cases.Title}}</td>
+							<td>{{$cases.FileFor}}</td>
+							<td>{{$cases.FileAgainst}}</td>
+							<td>
+								<button type="submit" class="btn btn-success btn-xs" name="affirm" value="affirm-{{$cases.ID}}" aria-label="affirm" form="dashboard"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+								<button type="submit" class="btn btn-warning btn-xs" name="reverse" value="reverse-{{$cases.ID}}" aria-label="reverse" form="dashboard"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+							</td>
+							<td>
+								<button type="submit" class="btn btn-danger btn-xs" name="delete" value="delete-{{$cases.ID}}" aria-label="delete" form="dashboard"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+							</td>
+						</tr>
+						{{end}}
+						<!-- <tr class="success">
+							<td>
+								<strong>Add new case</strong>
+							</td>
+							<td>
+								<input type="text" name="title" placeholder="Title">
+							</td>
+							<td>
+								<input type="text" name="summary" placeholder="Summary">
+							</td>
+							<td>
+								<input type="file" name="file-for">
+							</td>
+							<td>
+								<input type="file" name="file-against">
+							</td>
+							<td>
+								<input class="btn btn-xs btn-primary" type="submit" name="submit" value="Submit">
+							</td>
+						</tr> -->
+					</tbody>
+				</table>
+				<button onclick="showHideForm()" type="button" name="add-case" id="add-case" class="btn btn-success"><span id="add-span" class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+			</form>
+			<form class="form-horizontal" id="new-case" action="/" method="post">
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<h4>Add new case</h4>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="title" class="col-sm-2 control-label">Title</label>
+					<div class="col-sm-10">
+						<input type="text" name="title" id="title">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="summary" class="col-sm-2 control-label">Summary</label>
+					<div class="col-sm-10">
+						<!-- <input type="text" name="summary" id="summary"> -->
+						<textarea name="summary" id="summary" rows="8" cols="40"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="file-for">File For</label>
+					<div class="col-sm-10">
+						<input type="file" name="file-for" id="file-for">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="file-against">File Against</label>
+					<div class="col-sm-10">
+						<input type="file" name="file-against" id="file-against">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<input class="btn btn-primary" type="submit" name="submitNewCase" value="Add">
+					</div>
+				</div>
+			</form>
+			<!-- <form class="form-inline bg-success" id="new-case" action="index.html" method="post">
+				<h4>Add new case</h4>
+				<div class="form-group">
+					<label for="title" class="control-label">Title</label>
+						<input type="text" name="title" id="title">
+				</div>
+				<div class="form-group">
+					<label for="summary" class="control-label">Summary</label>
+					<input type="text" name="summary" id="summary">
+				</div>
+				<div class="form-group">
+					<label class="control-label" for="file-for">File For</label>
+					<input type="file" name="file-for" id="file-for">
+				</div>
+				<div class="form-group">
+					<label class="control-label" for="file-against">File Against</label>
+					<input type="file" name="file-against" id="file-against">
+				</div>
+				<div class="form-group">
+					<input class="btn btn-primary" type="submit" name="submitNewCase" value="Add">
+				</div>
+			</form> -->
+		</div>
+		<script type="text/javascript">
+			button = document.getElementById('add-case')
+			buttonSpan = document.getElementById('add-span');
+			form = document.getElementById('new-case');
+			form.style.visibility = "hidden";
+			formVisible = true;
+
+			function showHideForm(){
+				console.log(formVisible);
+				if (formVisible) {
+					form.style.visibility = "visible"
+					button.className = "btn btn-danger"
+					buttonSpan.className = "glyphicon glyphicon-minus"
+				} else {
+					form.style.visibility = "hidden"
+					button.className = "btn btn-success"
+					buttonSpan.className = "glyphicon glyphicon-plus"
+				}
+				formVisible = !formVisible
+			}
+
+		</script>
+	</body>
+</html>
