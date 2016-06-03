@@ -158,6 +158,7 @@ func main() {
 	s := http.StripPrefix("/css/", http.FileServer(http.Dir("./css/")))
 
 	r.PathPrefix("/css/").Handler(s)
+	r.PathPrefix("/files/").Handler(http.StripPrefix("/files/", http.FileServer(http.Dir("./files/"))))
 
 	// Set up and run negroni
 	n := negroni.Classic()

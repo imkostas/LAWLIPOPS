@@ -258,31 +258,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errorString := ""
-	// Set up bcrypt hash
-	// if r.FormValue("register") != "" {
-	// 	user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
-	// 	_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
-	// 	if user.ID != -1 {
-	// 		errorString = "Username already taken"
-	// 	} else {
-	// 		secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
-	// 		// TODO: Get seperate username or parse from email
-	// 		user = User{-1, r.FormValue("username"), r.FormValue("username"), secret, r.FormValue("username"), 0, false}
-	// 		if err := dbmap.Insert(&user); err != nil {
-	// 			errorString = err.Error()
-	// 		} else {
-	// 			session.Values["userLoggedIn"] = true
-	// 			session.Values["currentUser"] = user
-	// 			err := session.Save(r, w)
-	// 			CheckError(w, err, "err")
-	// 			// session.Values["userLoggedIn"]
-	// 			http.Redirect(w, r, "/", http.StatusFound)
-	// 			return
-	// 		}
-	// 	}
-	/*} else */ if r.FormValue("login") != "" {
-		// Validate account credentials
-		// user, err := dbmap.Get(User{}, r.FormValue("username"))
+
+	if r.FormValue("login") != "" {
 		var user User
 		err := dbmap.SelectOne(&user, "select * from accounts where username=?", string(r.FormValue("username")))
 		if err != nil {
