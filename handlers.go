@@ -17,12 +17,15 @@ import (
 
 const emptyFileString = "(empty)"
 
+// POST Const = "POST"
+const POST = "POST"
+
 // RootHandler function creates the home page view
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	var p = Page{}
 	errorString := ""
 
-	if r.Method == "POST" {
+	if r.Method == POST {
 		if r.FormValue("submitNewCase") != "" {
 			c := BinaryCase{}
 			// TODO:
@@ -171,7 +174,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		Display(w, "upload", p)
 
 	// POST takes the uploaded file(s) saves it to disk, and updates the database
-	case "POST":
+	case POST:
 		// parse the multipart form in the request
 		err := r.ParseMultipartForm(100000)
 		CheckError(w, err, "")
@@ -356,7 +359,7 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 	// Display account information
 	// Display(w, "account", p)
-	case "POST":
+	case POST:
 		if r.FormValue("submit-password") != "" {
 			if err := bcrypt.CompareHashAndPassword(p.CurrentUser.Secret, []byte(r.FormValue("currentPassword"))); err != nil {
 				errorString = "Current password field is incorrect"
