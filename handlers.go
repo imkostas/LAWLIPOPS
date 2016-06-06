@@ -16,16 +16,14 @@ import (
 )
 
 const emptyFileString = "(empty)"
-
-// POST Const = "POST"
-const POST = "POST"
+const post = "POST"
 
 // RootHandler function creates the home page view
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	var p = Page{}
 	errorString := ""
 
-	if r.Method == POST {
+	if r.Method == post {
 		if r.FormValue("submitNewCase") != "" {
 			c := BinaryCase{}
 			// TODO:
@@ -58,6 +56,15 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 
 			// Update cases database
 			if errorString == "" {
+				// if r.FormValue("file-for") != "" && r.FormValue("file-against") != "" {
+				// 	// TODO Upload files
+				// 	c.FileFor = fileUploadHandler(w, r, "file-for")
+				// 	c.FileAgainst = fileUploadHandler(w, r, "file-against")
+				// }
+
+				c.FileFor = fileUploadHandler(w, r, "file-for")
+				c.FileAgainst = fileUploadHandler(w, r, "file-against")
+
 				c.Date = time.Now().UTC().Format("2006-01-02")
 				err := dbmap.Insert(&c)
 				CheckError(w, err, "Insert error")
@@ -74,22 +81,22 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 			dbmap.Exec("DELETE FROM cases WHERE id=?", id)
 		} else if r.FormValue("save") != "" {
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("save"), "-")[1], 10, 64)
-			fileFor := ""
-			fileAgainst := ""
-			if r.FormValue("file-for") != "" {
-				fileFor = r.FormValue("file-for")
+
+			forString := fileUploadHandler(w, r, "file-for")
+			againstString := fileUploadHandler(w, r, "file-against")
+
+			// if forString != "(empty)" && againstString != "(empty)" {
+			if forString != emptyFileString {
+				if againstString != emptyFileString {
+					dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, againstString, id)
+				} else {
+					dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, id)
+				}
+			} else if againstString != emptyFileString {
+				dbmap.Exec("UPDATE cases SET title=?, summary=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), againstString, id)
 			} else {
-				fileFor = emptyFileString
+				dbmap.Exec("UPDATE cases SET title=?, summary=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), id)
 			}
-
-			if r.FormValue("file-against") != "" {
-				fileAgainst = r.FormValue("file-against")
-			} else {
-
-				fileAgainst = emptyFileString
-			}
-
-			dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), fileFor, fileAgainst, id)
 		}
 	}
 
@@ -125,6 +132,26 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		Display(w, "index", p)
 	}
+}
+
+func fileUploadHandler(w http.ResponseWriter, r *http.Request, fileKey string) string {
+	file, header, err := r.FormFile(fileKey)
+
+	if err == nil {
+		CheckError(w, err, "")
+		defer file.Close()
+
+		out, err := os.Create("files/" + header.Filename)
+		CheckError(w, err, "")
+		defer out.Close()
+
+		_, err = io.Copy(out, file)
+		CheckError(w, err, "")
+
+		return header.Filename
+	}
+
+	return "(empty)"
 }
 
 // ChallengesHandler function creates a view for the challenge with the given id
@@ -174,7 +201,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		Display(w, "upload", p)
 
 	// POST takes the uploaded file(s) saves it to disk, and updates the database
-	case POST:
+	case post:
 		// parse the multipart form in the request
 		err := r.ParseMultipartForm(100000)
 		CheckError(w, err, "")
@@ -196,7 +223,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			CheckError(w, err, "Unable to create the file for writing. Check your write access privilege")
 
 			defer dst.Close()
-			CheckError(w, err, "")
+			// CheckError(w, err, "")
 
 			// copy the uploaded file to the destination file
 			if _, er := io.Copy(dst, file); err != nil {
@@ -336,7 +363,7 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 	// Display account information
 	// Display(w, "account", p)
-	case POST:
+	case post:
 		if r.FormValue("submit-password") != "" {
 			if err := bcrypt.CompareHashAndPassword(p.CurrentUser.Secret, []byte(r.FormValue("currentPassword"))); err != nil {
 				errorString = "Current password field is incorrect"

@@ -53,7 +53,7 @@
 								</td>
 							</tr>
 							<tr class="collapse out">
-								<form class="form-inline" action="/" method="POST">
+								<form class="form-inline" action="/" method="POST" enctype="multipart/form-data">
 									<td>
 										Editing: {{$cases.Title}}
 									</td>
@@ -111,7 +111,7 @@
 				</table>
 				<button onclick="showHideForm()" type="button" name="add-case" id="add-case" class="btn btn-success"><span id="add-span" class="glyphicon glyphicon-plus" aria-hidden="true"></span> Case</button>
 			</form>
-			<form class="form-horizontal" id="new-case" action="/" method="post">
+			<form class="form-horizontal" id="new-case" action="/" method="post" enctype="multipart/form-data">
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<h4>Add new case</h4>
