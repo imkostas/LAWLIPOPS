@@ -52,24 +52,30 @@
   	</div>
   </nav> <!-- /Navbar -->
 	<header class="container">
-		<div class="row">
-			<h1 class="col-sm-13">
+		<!-- <div class="row"> -->
+			<!-- <h1 class="col-sm-13">
 				<div class="upload"><button type="button">Upload a file</button>
         </div>
-			</h1>
-    <h3 class ="cases">Cases</h3>
-	<ul>
-    {{range $cases := .Cases}}
-		<li>
-			<a href="/cases/{{$cases.ID}}">{{$cases.Title}}</a>
-		</li>
-		{{end}}
-	</ul>
-
-	<h3>Challenges</h3>
-	<uL>
-		<!-- TODO: List all of the challenges -->
-	</uL>
+			</h1> -->
+  <div class="row">
+    <div class="col-sm-6">
+      <h3 class ="cases">Cases</h3>
+  	  <div class="list-group">
+        {{range $cases := .Cases}}
+        <a href="/cases/{{$cases.ID}}" class="list-group-item">
+          <h4 class="list-group-item-heading">{{$cases.Title}}</h4>
+      		<p class="list-group-item-text">{{$cases.Summary}}</p>
+        </a>
+    		{{end}}
+  	  </div>
+    </div>
+    <div class="col-sm-6">
+    	<h3>Challenges</h3>
+    	<uL>
+    		<!-- TODO: List all of the challenges -->
+    	</uL>
+    </div>
+  </div>
 </header>
 </body>
 
