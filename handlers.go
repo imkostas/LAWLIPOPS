@@ -250,13 +250,41 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 // CaseHandler function creates a template for the case with the given id
 func CaseHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := store.Get(r, "lawlipops")
+	CheckError(w, err, "")
+
+	val := session.Values["userLoggedIn"]
+	loggedIn, ok := val.(bool)
+	if !ok {
+		log.Println("Error getting userLoggedIn value")
+	}
+
+	val = session.Values["currentUser"]
+	currentUser := &User{}
+	currentUser, ok = val.(*User)
+	if !ok {
+		log.Println("Error getting current user")
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
 	p := Page{}
+	p.CurrentUser = *currentUser
+	p.UserLoggedIn = loggedIn
+
+	if !loggedIn {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
+	errorString := ""
 	// vars := mux.Vars(r)
 	// caseID := vars["id"]
 	caseID := mux.Vars(r)["id"]
 	caseToDisplay := GetCase(w, r, caseID)
 
 	p.Cases = append(p.Cases, caseToDisplay)
+	p.Error = errorString
 
 	Display(w, "case", p)
 }
@@ -421,32 +449,33 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "lawlipops")
 
-	val := session.Values["userLoggedIn"]
-	loggedIn, ok := val.(bool)
-	if !ok {
-		log.Println("Error getting userLoggedIn value")
-	}
-
-	val = session.Values["currentUser"]
-	currentUser := &User{}
-	currentUser, ok = val.(*User)
-	if !ok {
-		log.Println("Error getting current user")
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
-
+	// val := session.Values["userLoggedIn"]
+	// loggedIn, ok := val.(bool)
+	// if !ok {
+	// 	log.Println("Error getting userLoggedIn value")
+	// }
+	//
+	// val = session.Values["currentUser"]
+	// currentUser := &User{}
+	// currentUser, ok = val.(*User)
+	// if !ok {
+	// 	log.Println("Error getting current user")
+	// 	http.Redirect(w, r, "/", http.StatusFound)
+	// 	return
+	// }
+	//
 	p := Page{}
-	p.CurrentUser = *currentUser
-	p.UserLoggedIn = loggedIn
-
-	if !loggedIn {
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
+	// p.CurrentUser = *currentUser
+	// p.UserLoggedIn = loggedIn
+	//
+	// if !loggedIn {
+	// 	http.Redirect(w, r, "/", http.StatusFound)
+	// 	return
+	// }
 	errorString := ""
 
-	if r.FormValue("submit") != "" {
+	// if r.FormValue("submit") != "" {
+	if r.Method == "POST" {
 		user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
 		_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
 		if user.ID != -1 {
