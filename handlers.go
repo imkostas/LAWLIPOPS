@@ -151,7 +151,7 @@ func fileUploadHandler(w http.ResponseWriter, r *http.Request, fileKey string) s
 		return header.Filename
 	}
 
-	return "(empty)"
+	return emptyFileString
 }
 
 // ChallengesHandler function creates a view for the challenge with the given id
@@ -250,12 +250,15 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 // CaseHandler function creates a template for the case with the given id
 func CaseHandler(w http.ResponseWriter, r *http.Request) {
+	p := Page{}
 	// vars := mux.Vars(r)
 	// caseID := vars["id"]
 	caseID := mux.Vars(r)["id"]
 	caseToDisplay := GetCase(w, r, caseID)
 
-	Display(w, "case", caseToDisplay)
+	p.Cases = append(p.Cases, caseToDisplay)
+
+	Display(w, "case", p)
 }
 
 // LoginHandler function
