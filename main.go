@@ -17,7 +17,6 @@ import (
 // Templates var holds a cached version of every template
 var Templates = template.Must(template.ParseFiles(
 	"templates/index.html",
-	"templates/upload.html",
 	"templates/challenges.html",
 	"templates/case.html",
 	"templates/login.html",
@@ -163,9 +162,6 @@ func main() {
 	// Set up and run negroni
 	n := negroni.Classic()
 	n.Use(negroni.HandlerFunc(VerifyDatabase))
-	// store := cookiestore.New([]byte("SECRET-CODE-TO-REPLACE"))
-	// n.Use(sessions.Sessions("lawlipops", store))
-	// TODO: Fix
 
 	n.UseHandler(r)
 	n.Run(":8000")
