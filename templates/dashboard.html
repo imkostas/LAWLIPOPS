@@ -84,9 +84,11 @@
 									<a class="btn btn-default btn-xs" role="button" href="/cases/{{$cases.ID}}">View</a>
 								</td>
 								<td>
-									<form id="dashboard" class="form-inline" action="/" method="POST">
-										<button type="submit" class="btn btn-danger btn-xs" name="delete" value="delete-{{$cases.ID}}" aria-label="delete" form="dashboard"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
-									</form>
+									<!-- <form id="dashboard" class="form-inline" action="/" method="POST"> -->
+										<!-- <button id="delete" data-toggle="modal" data-target="#myModal" type="submit" class="btn btn-danger btn-xs" name="delete" value="delete-{{$cases.ID}}" aria-label="delete" form="dashboard"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button> -->
+										<!-- <button data-toggle="modal" data-target="#myModal" class="btn btn-danger btn-xs" name="delete" aria-label="delete"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button> -->
+										<button data-id="{{$cases.ID}}" type="button" class="btn btn-danger btn-xs" data-toggle="modal" data-target="#myModal" name="delete" value="delete-{{$cases.ID}}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+									<!-- </form> -->
 								</td>
 							</tr>
 							<tr class="collapse out">
@@ -124,26 +126,6 @@
 								<!-- </form> -->
 							</tr>
 						{{end}}
-						<!-- <tr class="success">
-							<td>
-								<strong>Add new case</strong>
-							</td>
-							<td>
-								<input type="text" name="title" placeholder="Title">
-							</td>
-							<td>
-								<input type="text" name="summary" placeholder="Summary">
-							</td>
-							<td>
-								<input type="file" name="file-for">
-							</td>
-							<td>
-								<input type="file" name="file-against">
-							</td>
-							<td>
-								<input class="btn btn-xs btn-primary" type="submit" name="submit" value="Submit">
-							</td>
-						</tr> -->
 					</tbody>
 				</table>
 				<button onclick="showHideForm()" type="button" name="add-case" id="add-case" class="btn btn-success"><span id="add-span" class="glyphicon glyphicon-plus" aria-hidden="true"></span> Case</button>
@@ -208,43 +190,91 @@
 				</div>
 			</form> -->
 		</div>
+		<!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Danger!</h4>
+		      </div>
+		      <div class="modal-body">
+		        Are you sure you want to delete this case?
+		      </div>
+		      <div class="modal-footer">
+						<form id="confirmation" class="form-inline" action="/" method="POST">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button id="deleteBtn" type="submit" class="btn btn-danger" name="delete" value="delete"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete</button>
+						</form>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<!-- /Modal -->
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 		<script type="text/javascript">
-			addButton = document.getElementById('add-case')
+			addButton = document.getElementById('add-case');
 			addButtonSpan = document.getElementById('add-span');
 			newCaseForm = document.getElementById('new-case');
 			newCaseForm.style.visibility = "hidden";
 			newCaseFormVisible = true;
 
-			// editButtons[] = document.getElementsByClassName('edit')
-			// for (var i = 0; i < editButtons.length; i++) {
-			// 	editButtons[i].addEventListener("click", showEditForm)
-			// }
-
 			function showHideForm(){
 				console.log(newCaseFormVisible);
 				if (newCaseFormVisible) {
-					newCaseForm.style.visibility = "visible"
-					addButton.className = "btn btn-danger"
-					addButtonSpan.className = "glyphicon glyphicon-minus"
+					newCaseForm.style.visibility = "visible";
+					addButton.className = "btn btn-danger";
+					addButtonSpan.className = "glyphicon glyphicon-minus";
 				} else {
-					newCaseForm.style.visibility = "hidden"
-					addButton.className = "btn btn-success"
-					addButtonSpan.className = "glyphicon glyphicon-plus"
+					newCaseForm.style.visibility = "hidden";
+					addButton.className = "btn btn-success";
+					addButtonSpan.className = "glyphicon glyphicon-plus";
 				}
-				newCaseFormVisible = !newCaseFormVisible
+				newCaseFormVisible = !newCaseFormVisible;
 			}
 
 			function showEditForm(e){
 				// console.log(e);
 				formRow = e.path[2].nextElementSibling;
 				if (formRow.className == "collapse in") {
-					formRow.className = "collapse out"
+					formRow.className = "collapse out";
 				} else {
-					formRow.className = "collapse in"
+					formRow.className = "collapse in";
 				}
 			}
 
+			// var modalFrame = document.getElementById('myModal');
+			// var deleteButtons = document.getElementsByName('delete');
+			//
+			// for (var i = 0; i < deleteButtons.length; i++) {
+			// 	deleteButtons[i].addEventListener('click', function(){
+			// 		var modal2 = new Modal(modalFrame, {
+			// 		  content:
+			// 		  '<div class="modal-header">'
+			// 		  +'<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>'
+			// 		  +'<h4 class="modal-title" id="gridModalLabel">Modal title</h4>'
+			// 		  +'</div>'
+			// 		  +'<div class="modal-body">'
+			// 		  +'<p>This is where you fill up content you know, etc.</p>'
+			// 		  +'</div>'
+			// 		  +'<div class="modal-footer">'
+			// 		  +'<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
+			// 		  +'<button type="button" class="btn btn-primary">Save changes</button>'
+			// 		  +'</div>'
+			// 		});
+			// 	});
+			// }
+
+			$('#myModal').on('show.bs.modal', function(event){
+				var button = $(event.relatedTarget)
+				var recipient = button.data('id')
+				deleteButton = document.getElementById('deleteBtn')
+				deleteButton.value = "delete-" + recipient
+				// $("#deleteBtn").value = "delete-" + recipient
+			});
+
 		</script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script>
+		<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script> -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 	</body>
 </html>

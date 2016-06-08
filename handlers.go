@@ -250,6 +250,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 // CaseHandler function creates a template for the case with the given id
 func CaseHandler(w http.ResponseWriter, r *http.Request) {
+	p := Page{}
+
 	session, err := store.Get(r, "lawlipops")
 	CheckError(w, err, "")
 
@@ -259,23 +261,25 @@ func CaseHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error getting userLoggedIn value")
 	}
 
-	val = session.Values["currentUser"]
-	currentUser := &User{}
-	currentUser, ok = val.(*User)
-	if !ok {
-		log.Println("Error getting current user")
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
+	if loggedIn {
+		val = session.Values["currentUser"]
+		currentUser := &User{}
+		currentUser, ok = val.(*User)
+		if !ok {
+			log.Println("Error getting current user")
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		p.CurrentUser = *currentUser
 	}
 
-	p := Page{}
-	p.CurrentUser = *currentUser
 	p.UserLoggedIn = loggedIn
 
-	if !loggedIn {
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
+	// if !loggedIn {
+	// 	http.Redirect(w, r, "/", http.StatusFound)
+	// 	return
+	// }
 
 	errorString := ""
 	// vars := mux.Vars(r)
