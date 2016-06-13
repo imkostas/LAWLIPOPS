@@ -3,3 +3,4 @@
 .gitignore
 LAWLIPOPS
 files/*
+*.swp

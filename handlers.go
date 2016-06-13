@@ -26,7 +26,6 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == post {
 		if r.FormValue("submitNewCase") != "" {
 			c := BinaryCase{}
-			// TODO:
 			// Validate form
 			if r.FormValue("title") != "" {
 				c.Title = r.FormValue("title")
@@ -72,10 +71,12 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else if r.FormValue("affirm") != "" {
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
-			dbmap.Exec("UPDATE cases SET decision=? WHERE id=?", 1, id)
+			//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 1, id)
+			SetFinalDecision(id, 1)
 		} else if r.FormValue("reverse") != "" {
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
-			dbmap.Exec("UPDATE cases SET decision=? WHERE id=?", 2, id)
+			//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 2, id)
+			SetFinalDecision(id, 2)
 		} else if r.FormValue("delete") != "" {
 			id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
 			dbmap.Exec("DELETE FROM cases WHERE id=?", id)
@@ -453,32 +454,10 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "lawlipops")
 
-	// val := session.Values["userLoggedIn"]
-	// loggedIn, ok := val.(bool)
-	// if !ok {
-	// 	log.Println("Error getting userLoggedIn value")
-	// }
-	//
-	// val = session.Values["currentUser"]
-	// currentUser := &User{}
-	// currentUser, ok = val.(*User)
-	// if !ok {
-	// 	log.Println("Error getting current user")
-	// 	http.Redirect(w, r, "/", http.StatusFound)
-	// 	return
-	// }
-	//
 	p := Page{}
-	// p.CurrentUser = *currentUser
-	// p.UserLoggedIn = loggedIn
-	//
-	// if !loggedIn {
-	// 	http.Redirect(w, r, "/", http.StatusFound)
-	// 	return
-	// }
+
 	errorString := ""
 
-	// if r.FormValue("submit") != "" {
 	if r.Method == "POST" {
 		user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
 		_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
@@ -499,7 +478,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 				session.Values["currentUser"] = user
 				err := session.Save(r, w)
 				CheckError(w, err, "err")
-				// session.Values["userLoggedIn"]
+
 				http.Redirect(w, r, "/", http.StatusFound)
 				return
 			}
