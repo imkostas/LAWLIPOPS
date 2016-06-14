@@ -24,16 +24,9 @@
 	  				<li><a href="/challenges">Challenges</a></li> -->
 	  			</ul>
 	  			<ul class="nav navbar-nav navbar-right">
-	  				{{if .UserLoggedIn}}<p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>{{end}}
-	  				{{if .UserLoggedIn}}<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>{{end}}
-	  				<!-- <p>
-	  					{{if .UserLoggedIn}}
-	  						<a href="/logout">Logout</a>  <a href="/account">Account</a>
-	  					{{else}}
-	  						<a href="/login">Login</a>
-	  					{{end}}
-	  				</p> -->
 	  				{{if .UserLoggedIn}}
+						<p class="navbar-text">Hello, {{.CurrentUser.Username}}</p>
+						<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
 	  				<li><a href="/account">My Account</a></li>
 	  				<li><a href="/logout">Log out</a></li>
 	  				{{else}}
@@ -45,27 +38,27 @@
 	  </nav> <!-- /Navbar -->
 		<div class="container">
 			<h3>Register New Account</h3>
-			<div id="danger-message" class="alert alert-danger" role="alert">{{.Error}}</div>
-			<div id="warning-message" class="alert alert-warning" role="alert">{{.Message}}</div>
+	    <div class="row">
+	      <div class="col-md-12">
+	        {{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
+	        {{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+	      </div>
+	    </div>
+			<!-- <div id="danger-message" class="alert alert-danger" role="alert">{{.Error}}</div>
+			<div id="warning-message" class="alert alert-warning" role="alert">{{.Message}}</div> -->
 			<form class="form-horizontal" action="/register" method="POST">
-				<div class="form-group">
-			    <label for="inputUsername" class="col-sm-2 control-label">Username</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" id="inputUsername" placeholder="Username" required="" name="username">
-			    </div>
-			  </div>
-				<div class="form-group">
-			    <label for="inputNickname" class="col-sm-2 control-label">Nickname</label>
-			    <div class="col-sm-10">
-			      <input type="text" class="form-control" id="inputNickname" placeholder="Nickname" name="nickname">
-			    </div>
-			  </div>
 				<div class="form-group">
 					<label for="inputEmail" class="col-sm-2 control-label">Email</label>
 					<div class="col-sm-10">
 				    <input type="email" class="form-control" id="inputEmail" placeholder="example@domain.com" required="" name="email">
 				  </div>
 				</div>
+				<div class="form-group">
+			    <label for="inputUsername" class="col-sm-2 control-label">Username</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" id="inputUsername" placeholder="Username" name="username">
+			    </div>
+			  </div>
 				<div class="form-group">
 			    <label for="inputPassword" class="col-sm-2 control-label">Password</label>
 			    <div class="col-sm-10">

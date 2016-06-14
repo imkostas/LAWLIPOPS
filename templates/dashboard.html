@@ -25,7 +25,7 @@
 	  			</ul>
 	  			<ul class="nav navbar-nav navbar-right">
 	  				{{if .UserLoggedIn}}
-						<p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>
+						<p class="navbar-text">Hello, {{.CurrentUser.Username}}</p>
 						<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
 	  				<li><a href="/account">My Account</a></li>
 	  				<li><a href="/logout">Log out</a></li>

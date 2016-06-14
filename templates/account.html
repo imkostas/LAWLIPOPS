@@ -11,50 +11,45 @@
 	<body>
 		<!-- Navbar -->
 	  <nav class="navbar navbar-default">
-	  	<div class="container-fluid">
-	  		<div class="navbar-header">
-	  			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-	  				<span class="sr-only">Toggle navigation</span>
-	  				<span class="icon-bar"></span>
-	  				<span class="icon-bar"></span>
-	  				<span class="icon-bar"></span>
-	  			</button>
-	  			<a class="navbar-brand" href="/">LAWliPOPS</a>
-	  		</div><!-- Brand -->
-	  		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-	  			<ul class="nav navbar-nav">
-	  				<!-- <li><a href="/cases">Cases</a></li>
-	  				<li><a href="/challenges">Challenges</a></li> -->
-	  			</ul>
-	  			<ul class="nav navbar-nav navbar-right">
-	  				{{if .UserLoggedIn}}<p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>{{end}}
-	  				{{if .UserLoggedIn}}<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>{{end}}
-	  				<!-- <p>
-	  					{{if .UserLoggedIn}}
-	  						<a href="/logout">Logout</a>  <a href="/account">Account</a>
-	  					{{else}}
-	  						<a href="/login">Login</a>
-	  					{{end}}
-	  				</p> -->
-	  				{{if .UserLoggedIn}}
-	  				<li><a href="/account">My Account</a></li>
-	  				<li><a href="/logout">Log out</a></li>
-	  				{{else}}
-	  				<li><a href="/login">Login</a></li>
-	  				{{end}}
-	  			</ul>
-	  		</div><!-- /.navbar-collapse -->
-	  	</div>
+	    <div class="container-fluid">
+	      <div class="navbar-header">
+	        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	          <span class="sr-only">Toggle navigation</span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	        </button>
+	        <a class="navbar-brand" href="/">LAWliPOPS</a>
+	      </div><!-- Brand -->
+	      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+	        <ul class="nav navbar-nav">
+	          <!-- <li><a href="/cases">Cases</a></li>
+	          <li><a href="/challenges">Challenges</a></li> -->
+	        </ul>
+	        <ul class="nav navbar-nav navbar-right">
+	          {{if .UserLoggedIn}}
+	          <p class="navbar-text">Hello, {{.CurrentUser.Username}}</p>
+	          <p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
+	          <li><a href="/account">My Account</a></li>
+	          <li><a href="/logout">Log out</a></li>
+	          {{else}}
+	          <li><a href="/login">Login</a></li>
+	          {{end}}
+	        </ul>
+	      </div><!-- /.navbar-collapse -->
+	    </div>
 	  </nav> <!-- /Navbar -->
 		<div class="container">
-			<div>
-				<p style="color: red;">{{.Error}}</p>
-				<p style="color: green;">{{.Message}}</p>
+			<div class="row">
+				<div class="col-md-12">
+					{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
+					{{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+				</div>
 			</div>
 			<div class="row">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h2 class="panel-title">{{.CurrentUser.Nickname}}'s Account</h2>
+						<h2 class="panel-title">{{.CurrentUser.Username}}'s Account</h2>
 					</div>
 					<div class="panel-body">
 						{{with .CurrentUser}}
@@ -68,17 +63,17 @@
 			<div class="row">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h2 class="panel-title">Change Nickname</h2>
+						<h2 class="panel-title">Change Username</h2>
 					</div>
 					<div class="panel-body">
-						<span id="helpBlock" class="help-block">Current nickname: {{.CurrentUser.Nickname}}</span>
-						<strong><p>Update Nickname:</p></strong>
+						<span id="helpBlock" class="help-block">Current Username: {{.CurrentUser.Username}}</span>
+						<strong><p>Update Username:</p></strong>
 						<form class="" action="/account" method="POST">
 							<div class="form-group">
-								<label>New Nickname</label>
-								<input type="text" name="nickname" required=""><br />
+								<label>New Username</label>
+								<input type="text" name="username" required=""><br />
 							</div>
-							<input class="btn btn-default" type="submit" name="submit-nickname" value="Submit">
+							<input class="btn btn-default" type="submit" name="submit-username" value="Submit">
 						</form>
 					</div>
 				</div>
@@ -112,6 +107,21 @@
 				</div>
 				<!-- <div id="update-password">
 				</div> -->
+			</div>
+			<div class="row">
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h2 class="panel-title">Refresh Account Info</h2>
+					</div>
+					<div class="panel-body">
+						<!-- <strong><p>Update Password:</p></strong> -->
+						<form class="" action="/account" method="POST">
+							<!-- <div class="form-group">
+							</div> -->
+							<input class="btn btn-default" type="submit" name="refresh" value="Refresh">
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script>

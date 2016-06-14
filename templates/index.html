@@ -17,42 +17,41 @@
 <body>
   <!-- Navbar -->
   <nav class="navbar navbar-default">
-  	<div class="container-fluid">
-  		<div class="navbar-header">
-  			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-  				<span class="sr-only">Toggle navigation</span>
-  				<span class="icon-bar"></span>
-  				<span class="icon-bar"></span>
-  				<span class="icon-bar"></span>
-  			</button>
-  			<a class="navbar-brand" href="/">LAWliPOPS</a>
-  		</div><!-- Brand -->
-  		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-  			<ul class="nav navbar-nav">
-  				<!-- <li><a href="/cases">Cases</a></li>
-  				<li><a href="/challenges">Challenges</a></li> -->
-  			</ul>
-  			<ul class="nav navbar-nav navbar-right">
-  				{{if .UserLoggedIn}}<p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>{{end}}
-  				{{if .UserLoggedIn}}<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>{{end}}
-  				<!-- <p>
-  					{{if .UserLoggedIn}}
-  						<a href="/logout">Logout</a>  <a href="/account">Account</a>
-  					{{else}}
-  						<a href="/login">Login</a>
-  					{{end}}
-  				</p> -->
-  				{{if .UserLoggedIn}}
-  				<li><a href="/account">My Account</a></li>
-  				<li><a href="/logout">Log out</a></li>
-  				{{else}}
-  				<li><a href="/login">Login</a></li>
-  				{{end}}
-  			</ul>
-  		</div><!-- /.navbar-collapse -->
-  	</div>
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">LAWliPOPS</a>
+      </div><!-- Brand -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <!-- <li><a href="/cases">Cases</a></li>
+          <li><a href="/challenges">Challenges</a></li> -->
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {{if .UserLoggedIn}}
+          <p class="navbar-text">Hello, {{.CurrentUser.Username}}</p>
+          <p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
+          <li><a href="/account">My Account</a></li>
+          <li><a href="/logout">Log out</a></li>
+          {{else}}
+          <li><a href="/login">Login</a></li>
+          {{end}}
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div>
   </nav> <!-- /Navbar -->
 	<header class="container">
+		<div class="row">
+			<div class="col-md-12">
+				{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
+				{{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+			</div>
+		</div>
 		<!-- <div class="row"> -->
 			<!-- <h1 class="col-sm-13">
 				<div class="upload"><button type="button">Upload a file</button>

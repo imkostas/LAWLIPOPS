@@ -75,15 +75,22 @@
 
 		<div style="text-align: center;">
 		</div>
-
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
+					{{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+				</div>
+			</div>
+		</div>
 		<!-- <form id="login-form" method="POST" action="/login"> -->
 		<form name="login" id="login-form" onsubmit="validateForm()">
 			<div>
 				<h2>Sign in</h2>
 				<label></label>
 				  <div class="input-group">
-            <span class="input-group-addon" id="basic-addon1">Username</span>
-            <input type="text" class="form-control" name="username" placeholder="example@domain.com" aria-describedby="basic-addon1" required>
+            <span class="input-group-addon" id="basic-addon1">Email</span>
+            <input type="text" class="form-control" name="email" placeholder="example@domain.com" aria-describedby="basic-addon1" required>
           </div>
 				<!-- <input type="text/email" name="username" required="" placeholder="example@domain.com"><br /> -->
 			</div>

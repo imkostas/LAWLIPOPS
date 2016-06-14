@@ -88,7 +88,6 @@ type BinaryCase struct {
 type User struct {
 	ID        int64  `db:"id"`
 	Username  string `db:"username"`
-	Nickname  string `db:"nickname"`
 	Secret    []byte `db:"hash"`
 	Email     string `db:"email"`
 	Score     int    `db:"score"`
