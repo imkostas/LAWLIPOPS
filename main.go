@@ -23,7 +23,8 @@ var Templates = template.Must(template.ParseFiles(
 	"templates/account.html",
 	"templates/navbar.html",
 	"templates/register.html",
-	"templates/dashboard.html"))
+	"templates/dashboard.html",
+	"templates/search.html"))
 
 var local = false
 

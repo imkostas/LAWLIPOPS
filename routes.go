@@ -96,6 +96,12 @@ var routes = Routes{
 		"/register",
 		RegisterHandler,
 	},
+	Route{
+		"Search",
+		"GET",
+		"/search",
+		SearchHandler,
+	},
 }
 
 // NewRouter function creates a new router and returns a pointer to it

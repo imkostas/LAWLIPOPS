@@ -287,7 +287,6 @@ func CaseHandler(w http.ResponseWriter, r *http.Request) {
 	errorString := ""
 
 	if r.Method == post {
-		log.Println("POST")
 		if r.FormValue("affirm") != "" {
 			if p.UserLoggedIn {
 				id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
@@ -539,4 +538,50 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	p.Error = errorString
 	Display(w, "register", p)
+}
+
+// SearchHandler func
+func SearchHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "lawlipops")
+
+	val := session.Values["userLoggedIn"]
+	loggedIn, ok := val.(bool)
+	if !ok {
+		log.Println("Error getting userLoggedIn value")
+	}
+
+	p := Page{}
+	p.UserLoggedIn = loggedIn
+
+	if loggedIn {
+		val = session.Values["currentUser"]
+		currentUser := &User{}
+		currentUser, ok = val.(*User)
+		if !ok {
+			log.Println("Error getting current user")
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		p.CurrentUser = *currentUser
+		// Get updated account information from the server
+		dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
+		session.Values["currentUser"] = p.CurrentUser
+		session.Save(r, w)
+	}
+
+	errorString := ""
+
+	queryString := r.FormValue("query")
+	// c := []BinaryCase{}
+	//
+	// dbmap.Select(&c, "SELECT * FROM cases WHERE title, summary REGEXP ?", queryString)
+
+	// c := GetCases(w, r, "SELECT * FROM cases WHERE title, summary REGEXP '"+queryString+"'")
+	c := GetCases(w, r, "SELECT * FROM cases WHERE title LIKE '%"+queryString+"%' OR summary LIKE '%"+queryString+"%'")
+
+	p.Cases = append(p.Cases, c...)
+	p.Error = errorString
+
+	Display(w, "search", p)
 }

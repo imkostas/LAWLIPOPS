@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="../css/indexformat.css">
+  <!-- <link rel="stylesheet" type="text/css" href="../css/indexformat.css"> -->
 	   <title>Lawlipops</title>
 	<!-- <div class="top">
 		<h2><a href="/">Lawlipops</a></h2>
@@ -29,10 +29,19 @@
       </div><!-- Brand -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-          <!-- <li><a href="/cases">Cases</a></li>
-          <li><a href="/challenges">Challenges</a></li> -->
         </ul>
         <ul class="nav navbar-nav navbar-right">
+          <form class="navbar-form navbar-left" role="search" action="/search" method="GET">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" name="query" class="form-control" placeholder="Search for...">
+                <span class="input-group-btn">
+                  <!-- <button class="btn btn-default" type="submit">Go!</button> -->
+                  <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                </span>
+              </div>
+            </div>
+          </form>
           {{if .UserLoggedIn}}
           <p class="navbar-text">Hello, {{.CurrentUser.Username}}</p>
           <p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
@@ -45,7 +54,8 @@
       </div><!-- /.navbar-collapse -->
     </div>
   </nav> <!-- /Navbar -->
-	<header class="container">
+	<div class="container">
+
 		<div class="row">
 			<div class="col-md-12">
 				{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
@@ -98,19 +108,19 @@
     	</uL>
     </div>
   </div>
-</header>
+</div>
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 <script type="text/javascript">
   $('#cases-pending-tab a').click(function (e) {
-    e.preventDefault()
-    $(this).tab('show')
-  })
+    e.preventDefault();
+    $(this).tab('show');
+  });
 
   $('#cases-decided-tab a').click(function (e) {
-    e.preventDefault()
-    $(this).tab('show')
-  })
+    e.preventDefault();
+    $(this).tab('show');
+  });
 </script>
 <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script> -->
 </body>
