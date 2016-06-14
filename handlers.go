@@ -123,6 +123,11 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	p.UserLoggedIn = loggedIn
 	if loggedIn {
 		p.CurrentUser = *currentUser
+
+		// Get updated account information from the server
+		dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
+		session.Values["currentUser"] = p.CurrentUser
+		session.Save(r, w)
 	}
 	p.Cases = append(p.Cases, c...)
 	p.Error = errorString
@@ -270,6 +275,11 @@ func CaseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		p.CurrentUser = *currentUser
+
+		// Get updated account information from the server
+		dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
+		session.Values["currentUser"] = p.CurrentUser
+		session.Save(r, w)
 	}
 
 	p.UserLoggedIn = loggedIn
@@ -405,20 +415,25 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error getting userLoggedIn value")
 	}
 
-	val = session.Values["currentUser"]
-	currentUser := &User{}
-	currentUser, ok = val.(*User)
-	if !ok {
-		log.Println("Error getting current user")
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
-
 	p := Page{}
-	p.CurrentUser = *currentUser
 	p.UserLoggedIn = loggedIn
 
-	if !loggedIn {
+	if loggedIn {
+		val = session.Values["currentUser"]
+		currentUser := &User{}
+		currentUser, ok = val.(*User)
+		if !ok {
+			log.Println("Error getting current user")
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		p.CurrentUser = *currentUser
+		// Get updated account information from the server
+		dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
+		session.Values["currentUser"] = p.CurrentUser
+		session.Save(r, w)
+	} else {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
@@ -465,12 +480,12 @@ func AccountHandler(w http.ResponseWriter, r *http.Request) {
 			p.Message = "Username update successful"
 		}
 
-		if r.FormValue("refresh") != "" {
-			dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
-			session.Values["currentUser"] = p.CurrentUser
-			session.Save(r, w)
-			p.Message = "Account information has been updated"
-		}
+		// if r.FormValue("refresh") != "" {
+		// 	dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
+		// 	session.Values["currentUser"] = p.CurrentUser
+		// 	session.Save(r, w)
+		// 	p.Message = "Account information has been updated"
+		// }
 
 		// http.Redirect(w, r, "/account", http.StatusFound)
 		// return
