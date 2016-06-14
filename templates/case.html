@@ -29,8 +29,8 @@
   				<li><a href="/challenges">Challenges</a></li> -->
   			</ul>
   			<ul class="nav navbar-nav navbar-right">
-  				{{if .UserLoggedIn}}<p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>{{end}}
-  				{{if .UserLoggedIn}}<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>{{end}}
+  				<!-- {{if .UserLoggedIn}}{{end}}
+  				{{if .UserLoggedIn}}{{end}} -->
   				<!-- <p>
   					{{if .UserLoggedIn}}
   						<a href="/logout">Logout</a>  <a href="/account">Account</a>
@@ -39,6 +39,8 @@
   					{{end}}
   				</p> -->
   				{{if .UserLoggedIn}}
+          <p class="navbar-text">Hello, {{.CurrentUser.Nickname}}</p>
+          <p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
   				<li><a href="/account">My Account</a></li>
   				<li><a href="/logout">Log out</a></li>
   				{{else}}
@@ -48,6 +50,14 @@
   		</div><!-- /.navbar-collapse -->
   	</div>
   </nav> <!-- /Navbar -->
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
+        {{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+      </div>
+    </div>
+  </div>
   {{range $cases := .Cases}}
   <header class="container">
     <div class="row">
@@ -61,7 +71,7 @@
 
     <section class ="container">
       <div class ="row">
-        <figure class="col-sm-4">
+        <figure class="col-sm-4 offset-3">
             <p class="for">For: <a href="/files/{{.FileFor}}">{{$cases.FileFor}}</a></p>
         </figure>
         <figure class = "col-sm-6">
@@ -82,15 +92,22 @@
     <section class="container">
       <div class="btns">
         <figure class="col-sm-12">
-           <button type="button" class="btn btn-info active">Affirm</button>
-           <button type="button" class="btn btn-warning active">Reverse</button>
+          <form id="confirmation" class="form-inline" action="/cases/{{$cases.ID}}" method="POST">
+            <button type="submit" name="affirm" value="affirm-{{$cases.ID}}" class="btn btn-info">Affirm</button>
+            <button type="submit" name="reverse" value="reverse-{{$cases.ID}}" class="btn btn-warning">Reverse</button>
+          </form>
         </figure>
       </div>
     </section>
     </div>
   </header>
   {{end}}
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script>
+  <script type="text/javascript">
+
+  </script>
+  <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script> -->
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 </body>
 
 </html>

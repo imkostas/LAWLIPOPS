@@ -86,7 +86,6 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 			forString := fileUploadHandler(w, r, "file-for")
 			againstString := fileUploadHandler(w, r, "file-against")
 
-			// if forString != "(empty)" && againstString != "(empty)" {
 			if forString != emptyFileString {
 				if againstString != emptyFileString {
 					dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, againstString, id)
@@ -101,7 +100,8 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	c := GetCases(w, r, "SELECT * FROM cases WHERE archived = 0")
+	// c := GetCases(w, r, "SELECT * FROM cases WHERE archived = 0")
+	c := GetCases(w, r, "SELECT * FROM cases")
 
 	session, _ := store.Get(r, "lawlipops")
 
@@ -169,7 +169,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	//TODO: Update db operations to use gorp
 
-	// varname := "lab"
 	varname := ""
 	rows, err := db.Query("SELECT * FROM data WHERE doc LIKE '%" + varname + "%'")
 	CheckError(w, err, "Rows error")
@@ -212,7 +211,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		// get the *fileheaders
 		files := m.File["myfiles"]
-		// for i, _ := range files {
 		for i := 0; i < len(files); i++ {
 			// for each fileheader, get a handle to the actual file
 			file, err := files[i].Open()
@@ -277,12 +275,45 @@ func CaseHandler(w http.ResponseWriter, r *http.Request) {
 
 	p.UserLoggedIn = loggedIn
 
-	// if !loggedIn {
-	// 	http.Redirect(w, r, "/", http.StatusFound)
-	// 	return
-	// }
-
 	errorString := ""
+
+	if r.Method == post {
+		log.Println("POST")
+		if r.FormValue("affirm") != "" {
+			if p.UserLoggedIn {
+				id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
+				var existingVote string
+				dbmap.SelectOne(&existingVote, "SELECT id FROM `votes` WHERE account_id=? AND case_id=?", p.CurrentUser.ID, id)
+
+				if existingVote == "" {
+					dbmap.Exec("INSERT INTO `votes` (id, account_id, case_id, user_decision, final_decision) VALUES (NULL,?,?,?,?)", p.CurrentUser.ID, id, 1, 0)
+					p.Message = "Vote registered successfuly"
+				} else {
+					dbmap.Exec("UPDATE `votes` SET user_decision=? WHERE account_id=? AND case_id=?", 1, p.CurrentUser.ID, id)
+					p.Message = "Vote updated successfuly"
+				}
+			} else {
+				errorString = "You must be logged in to vote"
+			}
+		} else if r.FormValue("reverse") != "" {
+			if p.UserLoggedIn {
+				id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
+				var existingVote string
+				dbmap.SelectOne(&existingVote, "SELECT id FROM `votes` WHERE account_id=? AND case_id=?", p.CurrentUser.ID, id)
+
+				if existingVote == "" {
+					dbmap.Exec("INSERT INTO `votes` (id, account_id, case_id, user_decision, final_decision) VALUES (NULL,?,?,?,?)", p.CurrentUser.ID, id, 2, 0)
+					p.Message = "Vote registered successfuly"
+				} else {
+					dbmap.Exec("UPDATE `votes` SET user_decision=? WHERE account_id=? AND case_id=?", 2, p.CurrentUser.ID, id)
+					p.Message = "Vote updated successfuly"
+				}
+			} else {
+				errorString = "You must be logged in to vote"
+			}
+		}
+	}
+
 	// vars := mux.Vars(r)
 	// caseID := vars["id"]
 	caseID := mux.Vars(r)["id"]
@@ -458,7 +489,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	errorString := ""
 
-	if r.Method == "POST" {
+	if r.Method == post {
 		user := User{ID: -1, Username: "", Nickname: "", Secret: nil, Email: "", Score: -1, Suspended: false}
 		_ = dbmap.SelectOne(&user, "select * from accounts where username=?", r.FormValue("username"))
 		if user.ID != -1 {

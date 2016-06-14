@@ -158,7 +158,7 @@ func SetFinalDecision(id int64, decision int) {
 	dbmap.Exec("UPDATE cases SET final_decision=?, archived=1 WHERE id=?", decision, id)
 	// 3) Find all accountIDs of users who answered correctly
 	var ids []string
-	dbmap.Select(&ids, "SELECT id FROM votes WHERE user_decision=?", decision)
+	dbmap.Select(&ids, "SELECT account_id FROM votes WHERE case_id=? AND user_decision=?", id, decision)
 	// 4) Add points to each user who asnwered correctly
 	for _, id := range ids {
 		dbmap.Exec("UPDATE accounts SET score=score+? WHERE id=?", 10, id)

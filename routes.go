@@ -37,6 +37,12 @@ var routes = Routes{
 		CaseHandler,
 	},
 	Route{
+		"Case",
+		"POST",
+		"/cases/{id}",
+		CaseHandler,
+	},
+	Route{
 		"Upload",
 		"GET",
 		"/upload",

@@ -56,6 +56,7 @@
 					</thead>
 					<tbody>
 						{{range $cases := .Cases}}
+							{{if eq $cases.Archived "0"}}
 							<tr>
 								<td>{{$cases.ID}}</td>
 								<td>{{$cases.Date}}</td>
@@ -114,6 +115,7 @@
 									</td>
 								<!-- </form> -->
 							</tr>
+							{{end}}
 						{{end}}
 					</tbody>
 				</table>
@@ -186,7 +188,7 @@
 		        <h4 class="modal-title" id="decisionModalLabel">Set Decision?</h4>
 		      </div>
 		      <div class="modal-body">
-		        <span id="decision-body">Are you sure you want to set the decision to X?</span>
+		        <p id="decision-body">Are you sure you want to set the decision to X?</p>
 		      </div>
 		      <div class="modal-footer">
 						<form id="confirmation" class="form-inline" action="/" method="POST">
@@ -240,7 +242,7 @@
 				button = $(event.relatedTarget);
 				caseID = button.data('id');
 				action = button.data('action');
-				$('#decision-body').innerHTML = 'Are you sure you want to set the decision to '+action+'?';
+				document.getElementById('decision-body').innerHTML = 'Are you sure you want to set the decision to '+action+'?';
 				confirmButton = document.getElementById('confirmBtn');
 				confirmButton.value = action + '-' + caseID;
 				confirmButton.name = action
