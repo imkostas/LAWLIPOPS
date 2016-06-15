@@ -182,6 +182,8 @@ func main() {
 
 	r.PathPrefix("/css/").Handler(s)
 	r.PathPrefix("/files/").Handler(http.StripPrefix("/files/", http.FileServer(http.Dir("./files/"))))
+	r.PathPrefix("/logo/").Handler(http.StripPrefix("/logo/", http.FileServer(http.Dir("./logo/"))))
+	r.PathPrefix("/font-awesome-4.6.3/").Handler(http.StripPrefix("/font-awesome-4.6.3/", http.FileServer(http.Dir("./font-awesome-4.6.3/"))))
 
 	// Set up and run negroni
 	n := negroni.Classic()

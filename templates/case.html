@@ -72,15 +72,16 @@
     <section class ="container">
       <div class ="row">
         <figure class="col-sm-4 offset-3">
-            <p class="for">For: <a href="/files/{{.FileFor}}">{{$cases.FileFor}}</a></p>
+            {{if ne .FileFor "(empty)"}} <p class="for">For: <a href="/files/{{.FileFor}}">{{$cases.FileFor}}</a></p> {{end}}
         </figure>
         <figure class = "col-sm-6">
         </figure>
         <figure class="col-sm-2">
-          <p class="against">Against: <a href="/files/{{.FileAgainst}}">{{$cases.FileAgainst}}</a></p>
+          {{if ne .FileAgainst "(empty)"}} <p class="against">Against: <a href="/files/{{.FileAgainst}}">{{$cases.FileAgainst}}</a></p> {{end}}
         </figure>
     </section>
 
+    {{if eq .Archived "0"}}
     <section class="container">
       <div class="row">
         <figure class="col-sm-12">
@@ -99,6 +100,14 @@
         </figure>
       </div>
     </section>
+    {{else}}
+      {{if eq .FinalDecision "1"}}
+        <h4 class="text-center">The decision was affirmed</h4>
+      {{end}}
+      {{if eq .FinalDecision "2"}}
+        <h4 class="text-center">The decision was reversed</h4>
+      {{end}}
+    {{end}}
     </div>
   </header>
   {{end}}

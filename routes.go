@@ -42,18 +42,6 @@ var routes = Routes{
 		"/cases/{id}",
 		CaseHandler,
 	},
-	// Route{
-	// 	"Upload",
-	// 	"GET",
-	// 	"/upload",
-	// 	UploadHandler,
-	// },
-	// Route{
-	// 	"Upload",
-	// 	"POST",
-	// 	"/upload",
-	// 	UploadHandler,
-	// },
 	Route{
 		"Login",
 		"GET",

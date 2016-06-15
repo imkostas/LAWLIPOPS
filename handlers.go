@@ -573,11 +573,10 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	errorString := ""
 
 	queryString := r.FormValue("query")
-	// c := []BinaryCase{}
-	//
-	// dbmap.Select(&c, "SELECT * FROM cases WHERE title, summary REGEXP ?", queryString)
+	/** LEAVE THESE COMMENTS **/
+	// c := GetCases(w, r, "SELECT * FROM cases WHERE title RLIKE '"+queryString+"' OR summary RLIKE '"+queryString+"'")
+	// c := GetCases(w, r, "SELECT * FROM cases WHERE title REGEXP '"+queryString+"' OR summary REGEXP '"+queryString+"'")
 
-	// c := GetCases(w, r, "SELECT * FROM cases WHERE title, summary REGEXP '"+queryString+"'")
 	c := GetCases(w, r, "SELECT * FROM cases WHERE title LIKE '%"+queryString+"%' OR summary LIKE '%"+queryString+"%'")
 
 	p.Cases = append(p.Cases, c...)
