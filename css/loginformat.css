@@ -132,7 +132,7 @@ input {
 }
 
 .buttonOrange {
-  background: #FF7619;
+  background: #EC771D;
   border-radius: 7px;
   text-shadow: 1px 1px 0 rgba(39, 110, 204, .5);
   font-family: Arial;
@@ -150,7 +150,7 @@ input {
 }
 
 .buttonOrange:hover{
-  background: #e55d00;
+  background: #FF7619;
 }
 
 h4{
@@ -172,7 +172,7 @@ h4>a{
 h5{
   width:100%;
   text-align: center;
-  border-bottom:1px solid #757575;
+  border-bottom:1px solid #9B9B9B;
   line-height: 0.1em;
   margin-top: 3em;
 }
@@ -180,5 +180,5 @@ h5{
 h5 span{
   background: #ffffff;
   padding: 0 10px;
-  color: #757575;
+  color: #9B9B9B;
 }
