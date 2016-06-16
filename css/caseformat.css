@@ -1,49 +1,71 @@
-.top {
-  color:#BCC6CC;
-  font-family: "Garamond","advocate-c43";
-  text-decoration: none;
-  text-align: center;
+body { padding-top: 100px; }
+
+ul{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+  overflow: hidden;
 }
 
-.top:hover{
-
+li{
+  float:right;
 }
 
-.title{
-  text-align: center;
-  font-family: "Garamond", "advocate-c43";
-  /*margin-bottom: 5em;*/
-}
-
-.summary{
-  text-align: center;
-  margin-bottom: 10em;
-}
-
-.for{
-  /*display:inline;
-  text-align: left;
-  margin-left: 15em;*/
-}
-
-.against{
-  /*display:inline;
-  text-align: right;
-  margin-left: 60em;*/
-}
-
-.ques{
-  margin-top: 10em;
+li>p{
   display: block;
-  text-align:center;
+  color: white;
+  text-decoration: none;
+  padding: 10px 12px;
 }
 
-.btns{
+h3{
+  font-family: Arial;
+  margin-left: 3em;
+}
+
+td{
+    border:1px solid #000;
+}
+
+tr td:last-child{
+    width:1%;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+h4{
+  margin-top:3em;
   text-align: center;
 }
 
-.btns.btn-primary{}
+.affirm {
+  background: #EC771D;
+  color: white;
+  border-radius: 7px;
+  font-family: Arial;
+  font-size: 1.5em;
+  padding: 1em 10em;
+  margin-top:1em;
+  margin-left:5em;
+  float: left;
+}
 
-.jumbotron{
-  border-style: groove;
+.affirm:focus{
+  outline:none;
+}
+
+.reverse {
+  background: #000000;
+  color: white;
+  border-radius: 7px;
+  font-family: Arial;
+  font-size: 1.5em;
+  padding: 1em 10em;
+  margin-top:1em;
+  margin-right:5em;
+  float: right;
+}
+
+.reverse:focus{
+  outline:none;
 }
