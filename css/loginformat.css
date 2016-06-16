@@ -149,6 +149,10 @@ input {
   margin-top: 2em;
 }
 
+.fbbtn:hover{
+  background: #275b89;
+}
+
 .buttonOrange:hover{
   background: #FF7619;
 }

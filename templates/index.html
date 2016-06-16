@@ -1,127 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <!-- <link rel="stylesheet" type="text/css" href="../css/indexformat.css"> -->
-	   <title>Lawlipops</title>
-	<!-- <div class="top">
-		<h2><a href="/">Lawlipops</a></h2>
-
-	</div> -->
-	<!-- <hr /> -->
-</head>
-
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Index</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="../css/indexformat.css">
+	</head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-default">
+  <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/">LAWliPOPS</a>
-      </div><!-- Brand -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <form class="navbar-form navbar-left" role="search" action="/search" method="GET">
-            <div class="form-group">
-              <div class="input-group">
-                <input type="text" name="query" class="form-control" placeholder="Search for...">
-                <span class="input-group-btn">
-                  <!-- <button class="btn btn-default" type="submit">Go!</button> -->
-                  <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-                </span>
-              </div>
-            </div>
-          </form>
-          {{if .UserLoggedIn}}
-          <p class="navbar-text">Hello, {{.CurrentUser.Username}}</p>
-          <p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
-          <li><a href="/account">My Account</a></li>
-          <li><a href="/logout">Log out</a></li>
-          {{else}}
-          <li><a href="/login">Login</a></li>
-          {{end}}
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div>
-  </nav> <!-- /Navbar -->
-	<div class="container">
-
-		<div class="row">
-			<div class="col-md-12">
-				{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
-				{{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
-			</div>
-		</div>
-		<!-- <div class="row"> -->
-			<!-- <h1 class="col-sm-13">
-				<div class="upload"><button type="button">Upload a file</button>
-        </div>
-			</h1> -->
-  <div class="row">
-    <div class="col-md-6">
-      <h3 class ="cases">Cases</h3>
-      <ul class="nav nav-tabs" role="tablist">
-        <li id="cases-pending-tab" role="presentation" class="active"><a href="#cases-pending" aria-controls="cases-pending" role="tab" data-toggle="tab">Pending</a></li>
-        <li id="cases-decided-tab" role="presentation"><a href="#cases-decided" aria-controls="cases-decided" role="tab" data-toggle="tab">Decided</a></li>
-      </ul>
-      <div class="tab-content">
-        <div role="tabpanel" class="tab-pane fade in active" id="cases-pending">
-          <div class="list-group">
-            {{range $cases := .Cases}}
-              {{if eq $cases.Archived "0" }}
-              <a href="/cases/{{$cases.ID}}" class="list-group-item">
-                <h4 class="list-group-item-heading">{{$cases.Title}}</h4>
-            		<p class="list-group-item-text">{{$cases.Summary}}</p>
-              </a>
-              {{end}}
-        		{{end}}
-      	  </div>
-        </div>
-        <div role="tabpanel" class="tab-pane fade" id="cases-decided">
-          <div class="list-group">
-            {{range $cases := .Cases}}
-              {{if eq $cases.Archived "1" }}
-              <a href="/cases/{{$cases.ID}}" class="list-group-item">
-                <h4 class="list-group-item-heading">{{$cases.Title}}</h4>
-            		<p class="list-group-item-text">{{$cases.Summary}}</p>
-              </a>
-              {{end}}
-        		{{end}}
-      	  </div>
-        </div>
+        <a class="navbar-brand" href="#">
+          <img src="../logo/LAWLIPOPS_WHITE.png" height = "40" width="175">
+        </a>
       </div>
+      <ul>
+        <li><p class="navbar-text navbar-right">   </p></li>
+        <li><p class="navbar-text navbar-right"> LOG OUT </p></li>
+        <li><p class="navbar-text navbar-right"> MY ACCOUNT </p></li>
+        <li><p class="navbar-text navbar-right"> SCORE: 0 </p></li>
+        <li><p class="navbar-text navbar-right"> HELLO, USER </p></li>
+      </ul>
     </div>
-    <div class="col-md-6">
-    	<h3>Challenges</h3>
-    	<uL>
-    		<!-- TODO: List all of the challenges -->
-    	</uL>
+  </nav>
+  <div class="row">
+    <div class="col-sm-1"></div>
+    <div class="col-sm-6">
+       <h3><b>Cases:</b><h3>
+    </div>
+    <div class="col-sm-3">
+       <h3><b>Challenges:</b><h3>
     </div>
   </div>
-</div>
-<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-<script type="text/javascript">
-  $('#cases-pending-tab a').click(function (e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
+	<div class="row">
+		<div class="col-sm-6">
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
 
-  $('#cases-decided-tab a').click(function (e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
-</script>
-<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script> -->
+	</div>
+	<div class="row">
+		<div class="col-sm-6">
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
+		<table style="width: 60%" table align="center" class="table">
+		<tr>
+		    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+		</tr>
+		</table>
+	</div>
+	</div>
 </body>
 </html>
