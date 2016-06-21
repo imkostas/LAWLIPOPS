@@ -11,18 +11,6 @@ li{
   float:right;
 }
 
-li>p{
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 10px 12px;
-}
-
-h3{
-  font-family: Arial;
-  margin-left: 3em;
-}
-
 td{
     border:1px solid #333333;
     padding: 1em;
@@ -30,56 +18,55 @@ td{
 }
 
 tr td:last-child{
-    width:1%;
+    width:.5%;
     margin-left: 1em;
-    margin-right: 1em;
+    margin-right: .5em;
     border-radius: 5px;
 }
 
-h5{
-  margin-top:3em;
+h3{
+  font-family: Arial;
+  margin-left: 3em;
 }
 
-#outer{
+h5{
+  margin-top:2em;
+}
+
+.buttons{
+  margin-top: 2em;
   width: 100%;
   text-align: center;
 }
 
-.inner{
-  margin-top:1em;
-  display: inline-block;
-}
-
-.affirm {
+.btn-affirm{
   background: #EC771D;
+  border: 1px solid #EC771D;
   color: white;
-  border-radius: 7px;
-  border-color:#EC771D;
-  width:50em;
 }
 
-.affirm:focus{
+.btn-affirm:focus{
   outline:none;
 }
 
-.affirm:hover{
-  background-color: #FF7619;
-  color:white;
-}
-
-.reverse {
-  background: #000000;
+.btn-affirm:hover{
+  background: #FF7619;
+  border: 1px solid #FF7619;
   color: white;
-  border-radius: 7px;
-  border-color:#000000;
-  width:50em;
 }
 
-.reverse:focus{
-  outline:none;
+.btn-reverse{
+  background: #191919;
+  border: 1px solid #191919;
+  color: white;
 }
 
-.reverse:hover{
-  color:white;
-  background-color: #333333;
+.btn-reverse:focus{
+  outline: none;
+}
+
+.btn-reverse:hover{
+  background: #4c4c4c;
+  border: 1px solid #4c4c4c;
+  color: white;
 }

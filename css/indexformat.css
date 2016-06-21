@@ -11,17 +11,6 @@ li{
   float:right;
 }
 
-li>p{
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 10px 12px;
-}
-
-h3{
-  display: inline-block;
-}
-
 td{
     border:1px solid #333333;
     padding: 1em;
@@ -37,10 +26,12 @@ tr td:last-child{
 
 .block{
   font-size: .75em;
+  padding-bottom: 5em;
 }
 
-table{
-  margin-bottom:1em;
+h4>a:hover{
+  text-decoration: none;
+  color:#FF9933;
 }
 
 .table{
