@@ -1,0 +1,25 @@
+body { padding-top: 100px; }
+
+ul{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+  overflow: hidden;
+}
+
+li{
+  float:right;
+}
+
+td{
+    border:1px solid #333333;
+    padding: 1em;
+    border-radius: 5px;
+}
+
+tr td:last-child{
+    width:.5%;
+    margin-left: 1em;
+    margin-right: .5em;
+    border-radius: 5px;
+}
