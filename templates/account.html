@@ -3,31 +3,28 @@
 	<head>
 		<meta charset="utf-8">
 		<title>My Account</title>
-		<!-- <div>
-      <h2><a href="/">LAWliPOPS</a></h2>
-    </div> -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/accountformat.css">
 	</head>
 	<body>
 		<nav class="navbar navbar-inverse navbar-fixed-top">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<a class="navbar-brand" href="#">
-						<img src="../logo/LAWLIPOPS_WHITE.png" height = "30" width="175">
-					</a>
-				</div>
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <a class="navbar-brand" href="#">
+		        <img src="../logo/LAWLIPOPS_WHITE.png" height = "30" width="175">
+		      </a>
+		    </div>
 				<div class="navbar-collapse collapse">
-					 <ul class="nav navbar-nav navbar-right">
-							<li><a class="nav navbar-nav " href="/account">HELLO, {{.CurrentUser.Username}} </a></li>
+		       <ul class="nav navbar-nav navbar-right">
+				    	<li><a class="nav navbar-nav " href="/account">HELLO, {{.CurrentUser.Username}} </a></li>
 							<li class="divider-vertical"></li>
-							<li><a class="nav navbar-nav ">SCORE: {{.CurrentUser.Score}} </a></li>
+				    	<li><a class="nav navbar-nav ">SCORE: {{.CurrentUser.Score}} </a></li>
 							<li class="divider-vertical"></li>
-							<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>MY ACCOUNT</a></li>
+				    	<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>MY ACCOUNT</a></li>
 							<li class="divider-vertical"></li>
-							<li><a class="nav navbar-nav" href="/login">LOG OUT</a></li>
-					</ul>
-				</div>
+		          <li><a class="nav navbar-nav" href="/login">LOG OUT</a></li>
+		      </ul>
+		    </div>
 		</nav>
 		<div class="container">
 			<div class="row">
@@ -110,7 +107,7 @@
 					</div>
 				</div>
 			</div> -->
-		</div>
+
 		<script type="text/javascript" src="https://cdn.jsdelivr.net/bootstrap.native/1.0.2/bootstrap-native.min.js"></script>
 	</body>
 </html>

@@ -26,29 +26,25 @@
 	      </ul>
 	    </div>
 	</nav>
-	<div class="page header">
-  <div class="row">
-    <div class="col-sm-6">
-       <h2><b>Cases:</b><h2>
-    </div>
-    <div class="col-sm-3">
-       <h2><b>Challenges:</b><h2>
-    </div>
-  </div>
-</div>
+ <div class="case">
 	<div class="row">
 		<div class="col-sm-8">
+		<table style="width: 75%" table align="left" class="table">
+			<tr>
+				<th><h1><b>Cases:</b></h1></th>
+			</tr>
+		<tr>
 			{{range $cases := .Cases}}
 			{{if eq $cases.Archived "0" }}
-		<table style="width: 75%" table align="left" class="table">
-		<tr>
 		    <td id="case"><div><h4><a href="/"><b>{{$cases.Title}}</b></h4></a></div>{{$cases.Summary}}</td>
 		</tr>
+		{{end}}
+		{{end}}
 	</table>
-	{{end}}
-	{{end}}
+
 
 	</div>
 	</div>
+</div>
 </body>
 </html>
