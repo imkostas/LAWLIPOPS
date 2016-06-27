@@ -10,12 +10,3 @@ ul{
 li{
   float:right;
 }
-
-.panel-heading{
-  background-color: #EC771D !important;
-  color: white;
-}
-
-.panel-title{
-  color: white;
-}

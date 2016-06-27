@@ -36,7 +36,7 @@
 		<tr>
 			{{range $cases := .Cases}}
 			{{if eq $cases.Archived "0" }}
-		    <td id="case"><div><h4><a href="/"><b>{{$cases.Title}}</b></h4></a></div>{{$cases.Summary}}</td>
+		    <td id="case"><div><h4><a href="/cases/{{$cases.ID}}"><b>{{$cases.Title}}</b></h4></a></div>{{$cases.Summary}}</td>
 		</tr>
 		{{end}}
 		{{end}}

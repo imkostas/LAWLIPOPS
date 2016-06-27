@@ -10,7 +10,7 @@
 	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container-fluid">
 			<div class="navbar-header">
-				<a class="navbar-brand" href="#">
+				<a class="navbar-brand" href="/search">
 					<img src="../logo/LAWLIPOPS_WHITE.png" height = "30" width="175">
 				</a>
 			</div>
@@ -26,14 +26,22 @@
 				</ul>
 			</div>
 	</nav>
+	<div class="row">
+		<div class="col-md-12">
+			{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
+			{{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+		</div>
+	</div>
+	{{range $cases := .Cases}}
 <div class="page header">
-  <h3><b>OBB Personenverkehr AG v. Sachs, No. 13-1067</b><h3>
+  <h3><b>{{$cases.Title}}</b><h3>
 </div>
 <table style="width: 80%" table align="center">
 <tr>
-    <td class="block">Holding: A California woman’s lawsuit against the Austrian national railroad for injuries that she suffered while attempting to board a train in Austria does not fall within the “commercial activity” exception to the Foreign Sovereign Immunities Act, and is therefore barred by the doctrine of sovereign immunity. Although the plaintiff purchased a Eurail pass in the United States, her lawsuit is not “based upon a commercial activity carried on in the United States by a foreign state” because the conduct constituting the gravamen of her suit occurred in Austria.</td>
+    <td class="block">{{$cases.Summary}}</td>
 </tr>
 </table>
+{{end}}
     <h5>Do you think the court will affirm or reverse the decision?</h5>
 		<div class = "row">
          <div class="buttons">
