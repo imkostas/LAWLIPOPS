@@ -6,50 +6,60 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"/>
     <link rel="stylesheet" href="../css/caseformat.css">
 	</head>
-<body>
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="/search">
-					<img src="../logo/LAWLIPOPS_WHITE.png" height = "30" width="175">
-				</a>
-			</div>
-			<div class="navbar-collapse collapse">
-				 <ul class="nav navbar-nav navbar-right">
-						<li><a class="nav navbar-nav " href="/account">HELLO, {{.CurrentUser.Username}} </a></li>
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/">
+						<img src="../logo/LAWLIPOPS_WHITE.png" height="30" width="175">
+					</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav navbar-right">
+						{{if .UserLoggedIn}}
+						<li>
+							<p class="nav navbar-nav ">HELLO, {{.CurrentUser.Username}} </p>
+						</li>
 						<li class="divider-vertical"></li>
-						<li><a class="nav navbar-nav">SCORE: {{.CurrentUser.Score}} </a></li>
+						<li>
+							<p class="nav navbar-nav">SCORE: {{.CurrentUser.Score}} </p>
+						</li>
 						<li class="divider-vertical"></li>
 						<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>MY ACCOUNT</a></li>
 						<li class="divider-vertical"></li>
-						<li><a class="nav navbar-nav" href="/login">LOG OUT</a></li>
-				</ul>
+						<li><a class="nav navbar-nav" href="/logout">LOG OUT</a></li>
+						{{else}}
+						<li><a class="nav navbar-nav" href="/login">LOGIN</a></li>
+						{{end}}
+					</ul>
+				</div>
 			</div>
-	</nav>
-	<div class="row">
-		<div class="col-md-12">
-			{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
-			{{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+		</nav>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					{{if ne .Error ""}}<div class="alert alert-danger text-center" role="alert"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> {{.Error}}</div>{{end}}
+					{{if ne .Message ""}}<div class="alert alert-info text-center" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{.Message}}</div>{{end}}
+				</div>
+			</div>
+			{{range $cases := .Cases}}
+			<div class="page header">
+			  <h3><b>{{$cases.Title}}</b><h3>
+			</div>
+			<table style="width: 80%" table align="center">
+			<tr>
+			    <td class="block">{{$cases.Summary}}</td>
+			</tr>
+			</table>
+			{{end}}
+			<div class="row">
+				<h5>Do you think the court will affirm or reverse the decision?</h5>
+				<div class="buttons">
+					<div class="col-sm-1"></div>
+					<div class="col-sm-5"><button type="button" class="btn btn-affirm btn-lg btn-block" href="">Affirm</button></div>
+					<div class="col-sm-5"><button type="button" class="btn btn-reverse btn-lg btn-block" href="">Reverse</button></div>
+			    </div>
+		    </div>
 		</div>
-	</div>
-	{{range $cases := .Cases}}
-<div class="page header">
-  <h3><b>{{$cases.Title}}</b><h3>
-</div>
-<table style="width: 80%" table align="center">
-<tr>
-    <td class="block">{{$cases.Summary}}</td>
-</tr>
-</table>
-{{end}}
-    <h5>Do you think the court will affirm or reverse the decision?</h5>
-		<div class = "row">
-         <div class="buttons">
-					 <div class="col-sm-1"></div>
-           <div class="col-sm-5"><button type="button" class="btn btn-affirm btn-lg btn-block" href="">Affirm</button></div>
-					 <div class="col-sm-5"><button type="button" class="btn btn-reverse btn-lg btn-block" href="">Reverse</button></div>
-        </div>
-	    </div>
-	</div>
-</body>
+	</body>
 </html>

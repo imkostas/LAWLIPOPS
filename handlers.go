@@ -1,17 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
 )
 
 const emptyFileString = "(empty)"
@@ -22,85 +25,86 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	var p = Page{}
 	errorString := ""
 
-	if r.Method == post {
-		if r.FormValue("submitNewCase") != "" {
-			c := BinaryCase{}
-			// Validate form
-			if r.FormValue("title") != "" {
-				c.Title = r.FormValue("title")
-			} else {
-				errorString = "Error: Please enter a title"
-			}
-
-			if r.FormValue("summary") != "" {
-				c.Summary = r.FormValue("summary")
-			} else {
-				errorString = "Error: Please enter a summary"
-			}
-
-			if r.FormValue("file-for") != "" {
-				c.FileFor = r.FormValue("file-for")
-			} else {
-				// CHANGE TO THROW Error
-				c.FileFor = emptyFileString
-			}
-
-			if r.FormValue("file-against") != "" {
-				c.FileAgainst = r.FormValue("file-against")
-			} else {
-				// CHANGE TO THROW Error
-				c.FileAgainst = emptyFileString
-			}
-
-			// Update cases database
-			if errorString == "" {
-				// if r.FormValue("file-for") != "" && r.FormValue("file-against") != "" {
-				// 	// TODO Upload files
-				// 	c.FileFor = fileUploadHandler(w, r, "file-for")
-				// 	c.FileAgainst = fileUploadHandler(w, r, "file-against")
-				// }
-
-				c.FileFor = fileUploadHandler(w, r, "file-for")
-				c.FileAgainst = fileUploadHandler(w, r, "file-against")
-
-				c.Date = time.Now().UTC().Format("2006-01-02")
-				err := dbmap.Insert(&c)
-				CheckError(w, err, "Insert error")
-				p.Message = "New case added successfuly!"
-			}
-		} else if r.FormValue("affirm") != "" {
-			id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
-			//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 1, id)
-			SetFinalDecision(id, 1)
-		} else if r.FormValue("reverse") != "" {
-			id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
-			//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 2, id)
-			SetFinalDecision(id, 2)
-		} else if r.FormValue("delete") != "" {
-			id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
-			dbmap.Exec("DELETE FROM cases WHERE id=?", id)
-		} else if r.FormValue("save") != "" {
-			id, _ := strconv.ParseInt(strings.Split(r.FormValue("save"), "-")[1], 10, 64)
-
-			forString := fileUploadHandler(w, r, "file-for")
-			againstString := fileUploadHandler(w, r, "file-against")
-
-			if forString != emptyFileString {
-				if againstString != emptyFileString {
-					dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, againstString, id)
-				} else {
-					dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, id)
-				}
-			} else if againstString != emptyFileString {
-				dbmap.Exec("UPDATE cases SET title=?, summary=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), againstString, id)
-			} else {
-				dbmap.Exec("UPDATE cases SET title=?, summary=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), id)
-			}
-		}
-	}
+	// if r.Method == post {
+	// 	if r.FormValue("submitNewCase") != "" {
+	// 		c := BinaryCase{}
+	// 		// Validate form
+	// 		if r.FormValue("title") != "" {
+	// 			c.Title = r.FormValue("title")
+	// 		} else {
+	// 			errorString = "Error: Please enter a title"
+	// 		}
+	//
+	// 		if r.FormValue("summary") != "" {
+	// 			c.Summary = r.FormValue("summary")
+	// 		} else {
+	// 			errorString = "Error: Please enter a summary"
+	// 		}
+	//
+	// 		if r.FormValue("file-for") != "" {
+	// 			c.FileFor = r.FormValue("file-for")
+	// 		} else {
+	// 			// CHANGE TO THROW Error
+	// 			c.FileFor = emptyFileString
+	// 		}
+	//
+	// 		if r.FormValue("file-against") != "" {
+	// 			c.FileAgainst = r.FormValue("file-against")
+	// 		} else {
+	// 			// CHANGE TO THROW Error
+	// 			c.FileAgainst = emptyFileString
+	// 		}
+	//
+	// 		// Update cases database
+	// 		if errorString == "" {
+	// 			// if r.FormValue("file-for") != "" && r.FormValue("file-against") != "" {
+	// 			// 	// TODO Upload files
+	// 			// 	c.FileFor = fileUploadHandler(w, r, "file-for")
+	// 			// 	c.FileAgainst = fileUploadHandler(w, r, "file-against")
+	// 			// }
+	//
+	// 			c.FileFor = fileUploadHandler(w, r, "file-for")
+	// 			c.FileAgainst = fileUploadHandler(w, r, "file-against")
+	//
+	// 			c.Date = time.Now().UTC().Format("2006-01-02")
+	// 			err := dbmap.Insert(&c)
+	// 			CheckError(w, err, "Insert error")
+	// 			p.Message = "New case added successfuly!"
+	// 		}
+	// 	} else if r.FormValue("affirm") != "" {
+	// 		id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
+	// 		//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 1, id)
+	// 		SetFinalDecision(id, 1)
+	// 	} else if r.FormValue("reverse") != "" {
+	// 		id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
+	// 		//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 2, id)
+	// 		SetFinalDecision(id, 2)
+	// 	} else if r.FormValue("delete") != "" {
+	// 		id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
+	// 		dbmap.Exec("DELETE FROM cases WHERE id=?", id)
+	// 	} else if r.FormValue("save") != "" {
+	// 		id, _ := strconv.ParseInt(strings.Split(r.FormValue("save"), "-")[1], 10, 64)
+	//
+	// 		forString := fileUploadHandler(w, r, "file-for")
+	// 		againstString := fileUploadHandler(w, r, "file-against")
+	//
+	// 		if forString != emptyFileString {
+	// 			if againstString != emptyFileString {
+	// 				dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, againstString, id)
+	// 			} else {
+	// 				dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, id)
+	// 			}
+	// 		} else if againstString != emptyFileString {
+	// 			dbmap.Exec("UPDATE cases SET title=?, summary=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), againstString, id)
+	// 		} else {
+	// 			dbmap.Exec("UPDATE cases SET title=?, summary=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), id)
+	// 		}
+	// 	}
+	// }
 
 	// c := GetCases(w, r, "SELECT * FROM cases WHERE archived = 0")
 	c := GetCases(w, r, "SELECT * FROM cases")
+	ch := GetChallenges(w, r, "SELECT * FROM challenges")
 
 	session, _ := store.Get(r, "lawlipops")
 
@@ -130,13 +134,176 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 		session.Save(r, w)
 	}
 	p.Cases = append(p.Cases, c...)
+	p.Challenges = append(p.Challenges, ch...)
 	p.Error = errorString
+	//
+	// if p.CurrentUser.Email == "chris@test.com" {
+	// 	Display(w, "dashboard", p)
+	// } else {
+	Display(w, "index", p)
+	// }
+}
+
+func DashboardHandler(w http.ResponseWriter, r *http.Request) {
+	var p = Page{}
+	errorString := ""
+
+	session, _ := store.Get(r, "lawlipops")
+
+	val := session.Values["userLoggedIn"]
+	loggedIn, _ := val.(bool)
+
+	val = session.Values["currentUser"]
+	currentUser := &User{}
+	currentUser, _ = val.(*User)
+
+	p.UserLoggedIn = loggedIn
+	if loggedIn {
+		p.CurrentUser = *currentUser
+
+		// Get updated account information from the server
+		dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
+		session.Values["currentUser"] = p.CurrentUser
+		session.Save(r, w)
+	}
 
 	if p.CurrentUser.Email == "chris@test.com" {
+		if r.Method == post {
+			if r.FormValue("submitNewCase") != "" {
+				c := BinaryCase{}
+				// Validate form
+				if r.FormValue("title") != "" {
+					c.Title = r.FormValue("title")
+				} else {
+					errorString = "Error: Please enter a title"
+				}
+
+				if r.FormValue("summary") != "" {
+					c.Summary = r.FormValue("summary")
+				} else {
+					errorString = "Error: Please enter a summary"
+				}
+
+				if r.FormValue("file-for") != "" {
+					c.FileFor = r.FormValue("file-for")
+				} else {
+					// CHANGE TO THROW Error
+					c.FileFor = emptyFileString
+				}
+
+				if r.FormValue("file-against") != "" {
+					c.FileAgainst = r.FormValue("file-against")
+				} else {
+					// CHANGE TO THROW Error
+					c.FileAgainst = emptyFileString
+				}
+
+				// Update cases database
+				if errorString == "" {
+					// if r.FormValue("file-for") != "" && r.FormValue("file-against") != "" {
+					// 	// TODO Upload files
+					// 	c.FileFor = fileUploadHandler(w, r, "file-for")
+					// 	c.FileAgainst = fileUploadHandler(w, r, "file-against")
+					// }
+
+					c.FileFor = fileUploadHandler(w, r, "file-for")
+					c.FileAgainst = fileUploadHandler(w, r, "file-against")
+
+					c.Date = time.Now().UTC().Format("2006-01-02")
+					err := dbmap.Insert(&c)
+					CheckError(w, err, "Insert error")
+					p.Message = "New case added successfuly!"
+				}
+			} else if r.FormValue("affirm") != "" {
+				id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
+				//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 1, id)
+				SetFinalDecision(id, 1)
+			} else if r.FormValue("reverse") != "" {
+				id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
+				//dbmap.Exec("UPDATE cases SET final_decision=? WHERE id=?", 2, id)
+				SetFinalDecision(id, 2)
+			} else if r.FormValue("delete") != "" {
+				id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
+				dbmap.Exec("DELETE FROM cases WHERE id=?", id)
+			} else if r.FormValue("save") != "" {
+				id, _ := strconv.ParseInt(strings.Split(r.FormValue("save"), "-")[1], 10, 64)
+
+				forString := fileUploadHandler(w, r, "file-for")
+				againstString := fileUploadHandler(w, r, "file-against")
+
+				if forString != emptyFileString {
+					if againstString != emptyFileString {
+						dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, againstString, id)
+					} else {
+						dbmap.Exec("UPDATE cases SET title=?, summary=?, file_for=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), forString, id)
+					}
+				} else if againstString != emptyFileString {
+					dbmap.Exec("UPDATE cases SET title=?, summary=?, file_against=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), againstString, id)
+				} else {
+					dbmap.Exec("UPDATE cases SET title=?, summary=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), id)
+				}
+			}
+		}
+
+		c := GetCases(w, r, "SELECT * FROM cases")
+		ch := GetChallenges(w, r, "SELECT * FROM challenges")
+
+		p.Cases = append(p.Cases, c...)
+		p.Challenges = append(p.Challenges, ch...)
+		p.Error = errorString
+
 		Display(w, "dashboard", p)
 	} else {
-		Display(w, "index", p)
+		http.Redirect(w, r, "/", http.StatusForbidden)
 	}
+}
+
+func DashboardChallengesHandler(w http.ResponseWriter, r *http.Request) {
+	var p = Page{}
+	errorString := ""
+
+	if r.FormValue("submitNewChallenge") != "" {
+		c := Challenge{}
+		// Validate form
+		if r.FormValue("title") != "" {
+			c.Title = r.FormValue("title")
+		} else {
+			errorString = "Error: Please enter a title"
+		}
+
+		if r.FormValue("summary") != "" {
+			c.Summary = r.FormValue("summary")
+		} else {
+			errorString = "Error: Please enter a summary"
+		}
+
+		// Update challenges database
+		if errorString == "" {
+			// if r.FormValue("file-for") != "" && r.FormValue("file-against") != "" {
+			// 	// TODO Upload files
+			// 	c.FileFor = fileUploadHandler(w, r, "file-for")
+			// 	c.FileAgainst = fileUploadHandler(w, r, "file-against")
+			// }
+
+			c.Date = time.Now().UTC().Format("2006-01-02")
+			err := dbmap.Insert(&c)
+			CheckError(w, err, "Insert error")
+			p.Message = "New case added successfuly!"
+			log.Println(p.Message)
+		}
+	} else if r.FormValue("delete") != "" {
+		log.Println(r.FormValue("delete"))
+		id, _ := strconv.ParseInt(strings.Split(r.FormValue("delete"), "-")[1], 10, 64)
+		dbmap.Exec("DELETE FROM challenges WHERE id=?", id)
+		log.Println("delete")
+	} else if r.FormValue("save") != "" {
+		id, _ := strconv.ParseInt(strings.Split(r.FormValue("save"), "-")[1], 10, 64)
+		dbmap.Exec("UPDATE challenges SET title=?, summary=? WHERE id=?", r.FormValue("title"), r.FormValue("summary"), id)
+		log.Println("save")
+	}
+	log.Println(errorString)
+	log.Println("exit")
+	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
 }
 
 func fileUploadHandler(w http.ResponseWriter, r *http.Request, fileKey string) string {
@@ -518,9 +685,9 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			secret, _ := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
 			// TODO: Get seperate username or parse from email
 			if r.FormValue("username") != "" {
-				user = User{-1, r.FormValue("username"), secret, r.FormValue("email"), 0, false}
+				user = User{-1, r.FormValue("username"), secret, r.FormValue("email"), 0, false, "-1"}
 			} else {
-				user = User{-1, r.FormValue("email"), secret, r.FormValue("email"), 0, false}
+				user = User{-1, r.FormValue("email"), secret, r.FormValue("email"), 0, false, "-1"}
 			}
 			if err := dbmap.Insert(&user); err != nil {
 				errorString = err.Error()
@@ -583,4 +750,152 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	p.Error = errorString
 
 	Display(w, "search", p)
+}
+
+// HandleFacebookLogin func
+func HandleFacebookLogin(w http.ResponseWriter, r *http.Request) {
+	Url, err := url.Parse(oauthConf.Endpoint.AuthURL)
+	if err != nil {
+		log.Fatal("Parse: ", err)
+	}
+	parameters := url.Values{}
+	parameters.Add("client_id", oauthConf.ClientID)
+	parameters.Add("scope", strings.Join(oauthConf.Scopes, " "))
+	parameters.Add("redirect_uri", oauthConf.RedirectURL)
+	parameters.Add("response_type", "code")
+	parameters.Add("state", oauthStateString)
+	Url.RawQuery = parameters.Encode()
+	url := Url.String()
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
+// HandleFacebookCallback func
+func HandleFacebookCallback(w http.ResponseWriter, r *http.Request) {
+	state := r.FormValue("state")
+	if state != oauthStateString {
+		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	code := r.FormValue("code")
+
+	token, err := oauthConf.Exchange(oauth2.NoContext, code)
+	if err != nil {
+		fmt.Printf("oauthConf.Exchange() failed with '%s'\n", err)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	resp, err := http.Get("https://graph.facebook.com/me?access_token=" +
+		url.QueryEscape(token.AccessToken))
+	if err != nil {
+		fmt.Printf("Get: %s\n", err)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+	defer resp.Body.Close()
+
+	response, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("ReadAll: %s\n", err)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	log.Printf("parseResponseBody: %s\n", string(response))
+
+	type login struct {
+		name string
+		id   string
+	}
+
+	// res, _ := fb.Get("/me", fb.Params{
+	// 	"fields":       "first_name",
+	// 	"access_token": "a-valid-access-token",
+	// })
+	//
+	// log.Printf("%+v", res["email"])
+
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
+// ChallengeHandler function creates a template for the case with the given id
+func ChallengeHandler(w http.ResponseWriter, r *http.Request) {
+	p := Page{}
+
+	session, err := store.Get(r, "lawlipops")
+	CheckError(w, err, "")
+
+	val := session.Values["userLoggedIn"]
+	loggedIn, ok := val.(bool)
+	if !ok {
+		log.Println("Error getting userLoggedIn value")
+	}
+
+	if loggedIn {
+		val = session.Values["currentUser"]
+		currentUser := &User{}
+		currentUser, ok = val.(*User)
+		if !ok {
+			log.Println("Error getting current user")
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		p.CurrentUser = *currentUser
+
+		// Get updated account information from the server
+		dbmap.SelectOne(&p.CurrentUser, "SELECT * FROM accounts WHERE id=?", p.CurrentUser.ID)
+		session.Values["currentUser"] = p.CurrentUser
+		session.Save(r, w)
+	}
+
+	p.UserLoggedIn = loggedIn
+
+	errorString := ""
+
+	if r.Method == post {
+		// if r.FormValue("affirm") != "" {
+		// if p.UserLoggedIn {
+		// 	id, _ := strconv.ParseInt(strings.Split(r.FormValue("affirm"), "-")[1], 10, 64)
+		// 	var existingVote string
+		// 	dbmap.SelectOne(&existingVote, "SELECT id FROM `votes` WHERE account_id=? AND case_id=?", p.CurrentUser.ID, id)
+		//
+		// 	if existingVote == "" {
+		// 		dbmap.Exec("INSERT INTO `votes` (id, account_id, case_id, user_decision, final_decision) VALUES (NULL,?,?,?,?)", p.CurrentUser.ID, id, 1, 0)
+		// 		p.Message = "Vote registered successfuly"
+		// 	} else {
+		// 		dbmap.Exec("UPDATE `votes` SET user_decision=? WHERE account_id=? AND case_id=?", 1, p.CurrentUser.ID, id)
+		// 		p.Message = "Vote updated successfuly"
+		// 	}
+		// } else {
+		// 	errorString = "You must be logged in to vote"
+		// }
+		// } else if r.FormValue("reverse") != "" {
+		// if p.UserLoggedIn {
+		// 	id, _ := strconv.ParseInt(strings.Split(r.FormValue("reverse"), "-")[1], 10, 64)
+		// 	var existingVote string
+		// 	dbmap.SelectOne(&existingVote, "SELECT id FROM `votes` WHERE account_id=? AND case_id=?", p.CurrentUser.ID, id)
+		//
+		// 	if existingVote == "" {
+		// 		dbmap.Exec("INSERT INTO `votes` (id, account_id, case_id, user_decision, final_decision) VALUES (NULL,?,?,?,?)", p.CurrentUser.ID, id, 2, 0)
+		// 		p.Message = "Vote registered successfuly"
+		// 	} else {
+		// 		dbmap.Exec("UPDATE `votes` SET user_decision=? WHERE account_id=? AND case_id=?", 2, p.CurrentUser.ID, id)
+		// 		p.Message = "Vote updated successfuly"
+		// 	}
+		// } else {
+		// 	errorString = "You must be logged in to vote"
+		// }
+		// }
+	}
+
+	challengeID := mux.Vars(r)["id"]
+	challengeToDisplay := GetChallenge(w, r, challengeID)
+
+	p.Challenges = append(p.Challenges, challengeToDisplay)
+	p.Error = errorString
+
+	Display(w, "challenge", p)
 }

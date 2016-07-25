@@ -24,12 +24,12 @@ var routes = Routes{
 		"/",
 		RootHandler,
 	},
-	Route{
-		"Index",
-		"POST",
-		"/",
-		RootHandler,
-	},
+	// Route{
+	// 	"Index",
+	// 	"POST",
+	// 	"/",
+	// 	RootHandler,
+	// },
 	Route{
 		"Case",
 		"GET",
@@ -41,6 +41,18 @@ var routes = Routes{
 		"POST",
 		"/cases/{id}",
 		CaseHandler,
+	},
+	Route{
+		"Challenge",
+		"GET",
+		"/challenges/{id}",
+		ChallengeHandler,
+	},
+	Route{
+		"Challenge",
+		"POST",
+		"/challenges/{id}",
+		ChallengeHandler,
 	},
 	Route{
 		"Login",
@@ -89,6 +101,36 @@ var routes = Routes{
 		"GET",
 		"/search",
 		SearchHandler,
+	},
+	Route{
+		"FacebookAuthCallback",
+		"GET",
+		"/facebookCallback",
+		HandleFacebookCallback,
+	},
+	Route{
+		"FacebookAuth",
+		"GET",
+		"/facebookAuth",
+		HandleFacebookLogin,
+	},
+	Route{
+		"Dashboard",
+		"GET",
+		"/dashboard",
+		DashboardHandler,
+	},
+	Route{
+		"Dashboard",
+		"POST",
+		"/dashboard",
+		DashboardHandler,
+	},
+	Route{
+		"Dashboard",
+		"POST",
+		"/dashboard/challenges",
+		DashboardChallengesHandler,
 	},
 }
 
