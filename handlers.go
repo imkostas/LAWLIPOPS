@@ -745,8 +745,10 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	// c := GetCases(w, r, "SELECT * FROM cases WHERE title REGEXP '"+queryString+"' OR summary REGEXP '"+queryString+"'")
 
 	c := GetCases(w, r, "SELECT * FROM cases WHERE title LIKE '%"+queryString+"%' OR summary LIKE '%"+queryString+"%'")
+	ch := GetChallenges(w, r, "SELECT * FROM challenges WHERE title LIKE '%"+queryString+"%' OR summary LIKE '%"+queryString+"%'")
 
 	p.Cases = append(p.Cases, c...)
+	p.Challenges = append(p.Challenges, ch...)
 	p.Error = errorString
 
 	Display(w, "search", p)

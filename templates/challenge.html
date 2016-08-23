@@ -7,34 +7,41 @@
     <link rel="stylesheet" href="../css/caseformat.css">
 	</head>
 	<body>
-		<nav class="navbar navbar-inverse navbar-fixed-top">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<a class="navbar-brand" href="/">
-						<img src="../logo/LAWLIPOPS_WHITE.png" height="30" width="175">
-					</a>
-				</div>
-				<div class="navbar-collapse collapse">
-					<ul class="nav navbar-nav navbar-right">
-						{{if .UserLoggedIn}}
-						<li>
-							<p class="nav navbar-nav ">HELLO, {{.CurrentUser.Username}} </p>
-						</li>
-						<li class="divider-vertical"></li>
-						<li>
-							<p class="nav navbar-nav">SCORE: {{.CurrentUser.Score}} </p>
-						</li>
-						<li class="divider-vertical"></li>
-						<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>MY ACCOUNT</a></li>
-						<li class="divider-vertical"></li>
-						<li><a class="nav navbar-nav" href="/logout">LOG OUT</a></li>
-						{{else}}
-						<li><a class="nav navbar-nav" href="/login">LOGIN</a></li>
-						{{end}}
-					</ul>
-				</div>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="/">
+					<img src="../logo/LAWLIPOPS_WHITE.png" height="30" width="175">
+				</a>
 			</div>
-		</nav>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav navbar-right">
+					<form class="navbar-form navbar-left" role="search" action="/search" method="GET">
+						<div class="form-group">
+							<div class="input-group">
+								<input type="text" name="query" class="form-control" placeholder="Search for...">
+								<span class="input-group-btn">
+									<!-- <button class="btn btn-default" type="submit">Go!</button> -->
+									<button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+								</span>
+							</div>
+						</div>
+					</form>
+					{{if .UserLoggedIn}}
+					<li><p class="navbar-text">Hello, {{.CurrentUser.Username}} </p></li>
+					<!-- <li class="divider-vertical"></li> -->
+					<li><p class="navbar-text">Score: {{.CurrentUser.Score}} </p></li>
+					<!-- <li class="divider-vertical"></li> -->
+					<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>My Account</a></li>
+					<!-- <li class="divider-vertical"></li> -->
+					<li><a class="nav navbar-nav" href="/logout">Log Out</a></li>
+					{{else}}
+					<li><a class="nav navbar-nav" href="/login">Login</a></li>
+					{{end}}
+				</ul>
+			</div>
+		</div>
+	</nav>
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
@@ -43,23 +50,49 @@
 				</div>
 			</div>
 			{{range $challenges := .Challenges}}
-			<div class="page header">
-			  <h3><b>{{$challenges.Title}}</b><h3>
+			<div class="col-md-12">
+				<div class="page header">
+					<!-- <h3><b>{{$challenges.Title}}</b><h3> -->
+					<h2>{{$challenges.Title}} <small>{{$challenges.Date}}</small><h2>
+				</div>
 			</div>
-			<table style="width: 80%" table align="center">
-			<tr>
-			    <td class="block">{{$challenges.Summary}}</td>
-			</tr>
-			</table>
-			{{end}}
+			<!-- <table style="width: 80%" table align="center">
+				<tr>
+				    <td class="block">{{$challenges.Summary}}</td>
+				</tr>
+			</table> -->
 			<div class="row">
-				<h5>Do you think the court will affirm or reverse the decision?</h5>
-				<div class="buttons">
-					<div class="col-sm-1"></div>
-					<div class="col-sm-5"><button type="button" class="btn btn-affirm btn-lg btn-block" href="">Affirm</button></div>
-					<div class="col-sm-5"><button type="button" class="btn btn-reverse btn-lg btn-block" href="">Reverse</button></div>
+				<div class="col-md-12">
+					<p class="lead">
+						{{$challenges.Summary}}
+					</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h4>Files</h4>
+					<!-- <small>File: </small> -->
+					<a href="/files/{{$challenges.FileFor}}">{{$challenges.FileFor}}</a>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12 text-center">
+					<br>
+					<h4>Do you think the court will <strong>affirm</strong> or <strong>reverse</strong> the decision?</h4>
+				</div>
+				<div class="buttons col-md-12">
+					<form id="confirmation" class="" action="/challenges/{{$challenges.ID}}" method="POST">
+						<div class="form-group col-md-6">
+							<button type="submit" name="affirm" value="affirm-{{$challenges.ID}}" class="btn btn-affirm btn-lg btn-block">Affirm</button>
+						</div>
+						<div class="form-group col-md-6">
+							<button type="submit" name="reverse" value="reverse-{{$challenges.ID}}" class="btn btn-reverse btn-lg btn-block">Reverse</button>
+						</div>
+					</form>
 			    </div>
 		    </div>
+		    {{end}}
+				<!-- TODO: Add comments system -->
 		</div>
 	</body>
 </html>

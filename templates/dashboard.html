@@ -5,25 +5,28 @@
 	<meta charset="utf-8">
 	<title>Dashboard</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+	<style type="text/css">
+		body { padding-top: 70px; }
+		.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+    		color: #fff;
+    		background-color: #FF7619;
+		}
+		a {
+			color: #FF7619;
+			text-decoration: none;
+		}
+	</style>
 </head>
 
 <body>
-	<!-- Navbar -->
-	<nav class="navbar navbar-default">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container-fluid">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="/">LAWliPOPS</a>
+				<a class="navbar-brand" href="/">
+					<img src="../logo/LAWLIPOPS_WHITE.png" height="30" width="175">
+				</a>
 			</div>
-			<!-- Brand -->
-			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				<ul class="nav navbar-nav">
-				</ul>
+			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav navbar-right">
 					<form class="navbar-form navbar-left" role="search" action="/search" method="GET">
 						<div class="form-group">
@@ -37,19 +40,20 @@
 						</div>
 					</form>
 					{{if .UserLoggedIn}}
-					<p class="navbar-text">Hello, {{.CurrentUser.Username}}</p>
-					<p class="navbar-text">Score: {{.CurrentUser.Score}}</p>
-					<li><a href="/account">My Account</a></li>
-					<li><a href="/logout">Log out</a></li>
+					<li><p class="navbar-text">Hello, {{.CurrentUser.Username}} </p></li>
+					<!-- <li class="divider-vertical"></li> -->
+					<li><p class="navbar-text">Score: {{.CurrentUser.Score}} </p></li>
+					<!-- <li class="divider-vertical"></li> -->
+					<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>My Account</a></li>
+					<!-- <li class="divider-vertical"></li> -->
+					<li><a class="nav navbar-nav" href="/logout">Log Out</a></li>
 					{{else}}
-					<li><a href="/login">Login</a></li>
+					<li><a class="nav navbar-nav" href="/login">Login</a></li>
 					{{end}}
 				</ul>
 			</div>
-			<!-- /.navbar-collapse -->
 		</div>
 	</nav>
-	<!-- /Navbar -->
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-3">

@@ -28,53 +28,44 @@
 						</div>
 					</form>
 					{{if .UserLoggedIn}}
-					<li>
-						<p class="nav navbar-nav ">HELLO, {{.CurrentUser.Username}} </p>
-					</li>
-					<li class="divider-vertical"></li>
-					<li>
-						<p class="nav navbar-nav">SCORE: {{.CurrentUser.Score}} </p>
-					</li>
-					<li class="divider-vertical"></li>
-					<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>MY ACCOUNT</a></li>
-					<li class="divider-vertical"></li>
-					<li><a class="nav navbar-nav" href="/logout">LOG OUT</a></li>
+					<li><p class="navbar-text">Hello, {{.CurrentUser.Username}} </p></li>
+					<li><p class="navbar-text">Score: {{.CurrentUser.Score}} </p></li>
+					<li><a class="nav navbar-nav " href="/account"><i class= "glyphicon glyphicon-user fa-fw"></i>My Account</a></li>
+					<li><a class="nav navbar-nav" href="/logout">Log Out</a></li>
 					{{else}}
-					<li><a class="nav navbar-nav" href="/login">LOGIN</a></li>
+					<li><a class="nav navbar-nav" href="/login">Login</a></li>
 					{{end}}
 				</ul>
 			</div>
 		</div>
 	</nav>
 	<div class="containter">
-		<div class="row case">
-			<div class="col-md-6">
-				<table style="width: 75%" table align="left" class="table">
-					<tr>
-						<th><h1><b>Cases:</b></h1></th>
-					</tr>
-					<tr>
+		<div class="row">
+			<div class="col-md-5 col-md-offset-1">
+				<h1 class="cases">Cases:</h1>
+				<div class="list-group">
 					{{range $cases := .Cases}}
 					{{if eq $cases.Archived "0" }}
-				    <td id="case"><div><h4><a href="/cases/{{$cases.ID}}"><b>{{$cases.Title}}</b></h4></a></div>{{$cases.Summary}}</td>
-					</tr>
+				    	<a href="/cases/{{$cases.ID}}" class="list-group-item">
+				    		<h3 class="list-group-item-heading"><b>{{$cases.Title}}</b></h3>
+				    		<p class="list-group-item-text">{{$cases.Summary}}</p>
+				    	</a>
 					{{end}}
 					{{end}}
-				</table>
+				</div>
 			</div>
-			<div class="col-md-6">
-				<table style="width: 75%" table align="left" class="table">
-					<tr>
-						<th><h1><b>Challenges:</b></h1></th>
-					</tr>
-					<tr>
+			<div class="col-md-5">
+				<div class="list-group">
+				<h1 class="cases">Challenges:</h1>
 					{{range $challenges := .Challenges}}
 					{{if eq $challenges.Archived "0" }}
-				    <td id="challenge"><div><h4><a href="/challenges/{{$challenges.ID}}"><b>{{$challenges.Title}}</b></h4></a></div>{{$challenges.Summary}}</td>
-					</tr>
+						<a href="/challenges/{{$challenges.ID}}" class="list-group-item">
+				    		<h3 class="list-group-item-heading"><b>{{$challenges.Title}}</b></h3>
+				    		<p class="list-group-item-text">{{$challenges.Summary}}</p>
+				    	</a>
 					{{end}}
 					{{end}}
-				</table>
+				</div>
 			</div>
 		</div>
 	</div>
